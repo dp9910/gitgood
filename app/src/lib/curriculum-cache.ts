@@ -9,8 +9,8 @@ import {
  * Central cache repo where shared curricula are stored.
  * Format: repos/{owner}-{repo}/curriculum.json
  */
-const CACHE_REPO_OWNER = "gitgood-platform";
-const CACHE_REPO_NAME = "learning-curricula";
+const CACHE_REPO_OWNER = "dp9910";
+const CACHE_REPO_NAME = "gitgood-learning-material";
 
 export interface CurriculumTopic {
   name: string;

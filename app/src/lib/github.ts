@@ -267,4 +267,53 @@ export async function commitFile(
   };
 }
 
+// ---------- Gist support ----------
+
+export interface GistInfo {
+  owner: string;
+  gistId: string;
+}
+
+export interface GistContent {
+  owner: string;
+  gistId: string;
+  description: string;
+  files: { filename: string; language: string | null; content: string }[];
+}
+
+/**
+ * Parse a GitHub Gist URL into owner and gist ID.
+ * Supports: gist.github.com/owner/id, with optional file hash.
+ */
+export function parseGistUrl(url: string): GistInfo | null {
+  const match = url.match(
+    /(?:https?:\/\/)?gist\.github\.com\/([a-zA-Z0-9_.-]+)\/([a-f0-9]+)/
+  );
+  if (!match) return null;
+  return { owner: match[1], gistId: match[2] };
+}
+
+/**
+ * Fetch all files from a gist.
+ */
+export async function fetchGistContent(
+  octokit: Octokit,
+  gistId: string
+): Promise<GistContent> {
+  const response = await octokit.rest.gists.get({ gist_id: gistId });
+  const gist = response.data;
+
+  const owner = gist.owner?.login ?? "unknown";
+  const description = gist.description ?? "";
+  const files = Object.values(gist.files ?? {})
+    .filter((f): f is NonNullable<typeof f> => f != null)
+    .map((f) => ({
+      filename: f.filename ?? "unknown",
+      language: f.language ?? null,
+      content: f.content ?? "",
+    }));
+
+  return { owner, gistId, description, files };
+}
+
 export { RATE_LIMIT_WARNING_THRESHOLD };

@@ -38,6 +38,9 @@ yarn-error.log*
 .env.production.local
 # .env.example is safe to commit (no values)
 
+# generated output
+scripts/generated-course-output.json
+
 # vercel
 .vercel
 
