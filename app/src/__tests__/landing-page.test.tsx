@@ -13,10 +13,30 @@ vi.mock("../lib/github", () => ({
   },
 }));
 
+// Mock auth context
+const mockLogin = vi.fn();
+const mockLogout = vi.fn();
+const mockPush = vi.fn();
+let mockUser: { displayName: string; photoURL: string } | null = null;
+
+vi.mock("../lib/auth-context", () => ({
+  useAuth: () => ({
+    user: mockUser,
+    loading: false,
+    login: mockLogin,
+    logout: mockLogout,
+  }),
+}));
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: mockPush, replace: vi.fn() }),
+}));
+
 // Mock window.location
 const mockLocation = { href: "" };
 beforeEach(() => {
   vi.clearAllMocks();
+  mockUser = null;
   Object.defineProperty(window, "location", {
     value: mockLocation,
     writable: true,
@@ -67,7 +87,17 @@ describe("Landing page", () => {
     ).toBeTruthy();
   });
 
-  it("navigates to learn page on valid URL", () => {
+  it("redirects to login when not authenticated", () => {
+    render(<Home />);
+    fireEvent.change(getInput(), {
+      target: { value: "https://github.com/karpathy/micrograd" },
+    });
+    submitForm();
+    expect(mockPush).toHaveBeenCalledWith("/login");
+  });
+
+  it("navigates to learn page on valid URL when authenticated", () => {
+    mockUser = { displayName: "Test User", photoURL: "https://example.com/avatar.png" };
     render(<Home />);
     fireEvent.change(getInput(), {
       target: { value: "https://github.com/karpathy/micrograd" },
@@ -112,5 +142,17 @@ describe("Landing page", () => {
     expect(footer).toBeTruthy();
     expect(footer!.textContent).toContain("Terms");
     expect(footer!.textContent).toContain("Privacy");
+  });
+
+  it("shows Sign In button when logged out", () => {
+    render(<Home />);
+    expect(screen.getByText("Sign In")).toBeTruthy();
+  });
+
+  it("shows user info and Sign out when logged in", () => {
+    mockUser = { displayName: "Jane Doe", photoURL: "https://example.com/avatar.png" };
+    render(<Home />);
+    expect(screen.getByText("Jane Doe")).toBeTruthy();
+    expect(screen.getByText("Sign out")).toBeTruthy();
   });
 });

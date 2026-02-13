@@ -58,12 +58,13 @@ describe("getServerEnv", () => {
     expect(() => getServerEnv()).toThrow("Missing or invalid server environment variables");
   });
 
-  it("throws when KV_REST_API_URL is missing", async () => {
+  it("succeeds when KV_REST_API_URL is missing (optional)", async () => {
     const partial = { ...validServerEnv };
     delete (partial as Record<string, string | undefined>).KV_REST_API_URL;
     Object.assign(process.env, partial);
     const { getServerEnv } = await import("@/lib/env");
-    expect(() => getServerEnv()).toThrow("Missing or invalid server environment variables");
+    const env = getServerEnv();
+    expect(env.KV_REST_API_URL).toBe("");
   });
 
   it("rejects empty string values", async () => {

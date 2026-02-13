@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { parseRepoUrl } from "@/lib/github";
+import { useAuth } from "@/lib/auth-context";
 
 const EXAMPLE_REPOS = [
   { name: "karpathy/micrograd", label: "micrograd", stars: "6.8k" },
@@ -36,6 +38,8 @@ export default function Home() {
   const [url, setUrl] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const { user, loading: authLoading, logout } = useAuth();
+  const router = useRouter();
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -53,8 +57,13 @@ export default function Home() {
       return;
     }
 
+    // Require login before starting learning
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+
     setLoading(true);
-    // Navigate to learning page (will be built in later phase)
     window.location.href = `/learn/${parsed.owner}-${parsed.repo}`;
   }
 
@@ -80,12 +89,37 @@ export default function Home() {
               Browse Repos
             </a>
           </nav>
-          <a
-            href="/login"
-            className="bg-primary hover:bg-primary-hover text-white px-5 py-2 rounded-lg text-sm font-semibold transition-colors"
-          >
-            Start Learning
-          </a>
+          {authLoading ? (
+            <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 animate-pulse" />
+          ) : user ? (
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                {user.photoURL && (
+                  <img
+                    src={user.photoURL}
+                    alt=""
+                    className="w-8 h-8 rounded-full"
+                  />
+                )}
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300 hidden sm:inline">
+                  {user.displayName || user.email}
+                </span>
+              </div>
+              <button
+                onClick={() => logout()}
+                className="text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
+              >
+                Sign out
+              </button>
+            </div>
+          ) : (
+            <a
+              href="/login"
+              className="bg-primary hover:bg-primary-hover text-white px-5 py-2 rounded-lg text-sm font-semibold transition-colors"
+            >
+              Sign In
+            </a>
+          )}
         </div>
       </header>
 
@@ -227,10 +261,12 @@ export default function Home() {
             Stop starring repos you&apos;ll &quot;learn later.&quot; Start learning now.
           </p>
           <a
-            href="#"
+            href={user ? "#" : "/login"}
             onClick={(e) => {
-              e.preventDefault();
-              window.scrollTo({ top: 0, behavior: "smooth" });
+              if (user) {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }
             }}
             className="inline-flex items-center gap-2 bg-primary hover:bg-primary-hover text-white px-8 py-4 rounded-xl text-lg font-bold transition-colors shadow-lg shadow-primary/20"
           >
