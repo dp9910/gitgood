@@ -10,10 +10,10 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [signingIn, setSigningIn] = useState(false);
 
-  // Redirect to home if already logged in
+  // Redirect to dashboard if already logged in
   useEffect(() => {
     if (!loading && user) {
-      router.replace("/");
+      router.replace("/dashboard");
     }
   }, [user, loading, router]);
 
@@ -22,7 +22,7 @@ export default function LoginPage() {
     setSigningIn(true);
     try {
       await login();
-      router.replace("/");
+      router.replace("/dashboard");
     } catch (e) {
       const message =
         e instanceof Error ? e.message : "Sign-in failed. Please try again.";

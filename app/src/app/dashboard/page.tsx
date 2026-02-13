@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import SidebarLayout from "@/components/sidebar-layout";
+import OnboardingModal from "@/components/onboarding-modal";
 import {
   type HeatmapDay,
   generateHeatmapData,
@@ -230,8 +231,9 @@ function FilterTabs({
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { userProfile, profileLoading } = useAuth();
+  const { user, loading, userProfile, profileLoading, isNewUser, refreshProfile } = useAuth();
   const [filter, setFilter] = useState<PathFilter>("active");
+  const [showOnboarding, setShowOnboarding] = useState(true);
 
   const stats = userProfile?.stats;
   const paths = userProfile?.learningPaths ?? [];
@@ -264,7 +266,13 @@ export default function DashboardPage() {
     12
   );
 
-  if (profileLoading) {
+  // Redirect unauthenticated users to login
+  if (!loading && !user) {
+    router.replace("/login");
+    return null;
+  }
+
+  if (loading || profileLoading) {
     return (
       <SidebarLayout>
         <div className="flex items-center justify-center h-64" data-testid="loading">
@@ -274,8 +282,33 @@ export default function DashboardPage() {
     );
   }
 
+  async function handleOnboardingComplete(options?: { createRepo?: boolean }) {
+    try {
+      await fetch("/api/user/onboarding", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ createRepo: options?.createRepo ?? false }),
+      });
+      await refreshProfile();
+    } catch {
+      // Silently fail — profile will refresh on next load
+    }
+    setShowOnboarding(false);
+  }
+
+  function handleOnboardingSkip() {
+    setShowOnboarding(false);
+  }
+
   return (
     <SidebarLayout>
+      {/* Onboarding modal for new users */}
+      {isNewUser && showOnboarding && (
+        <OnboardingModal
+          onComplete={handleOnboardingComplete}
+          onSkip={handleOnboardingSkip}
+        />
+      )}
       {/* Stats Row */}
       <div
         className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"

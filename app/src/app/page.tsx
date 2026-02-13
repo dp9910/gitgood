@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { parseRepoUrl } from "@/lib/github";
 import { useAuth } from "@/lib/auth-context";
@@ -40,6 +40,13 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const { user, loading: authLoading, logout } = useAuth();
   const router = useRouter();
+
+  // Redirect logged-in users to dashboard
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.replace("/dashboard");
+    }
+  }, [user, authLoading, router]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
