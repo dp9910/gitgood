@@ -174,13 +174,21 @@ async function checkCooldown(
  * Returns rate limit headers on success for the client to display.
  */
 export async function checkRateLimit(
-  redis: Redis,
+  redis: Redis | null,
   userId: string,
   ip: string
 ): Promise<{
   result: RateLimitResult;
   headers: RateLimitHeaders;
 }> {
+  // If Redis is not configured, skip rate limiting entirely
+  if (!redis) {
+    return {
+      result: { allowed: true, remaining: DAILY_USER_LIMIT },
+      headers: buildHeaders(DAILY_USER_LIMIT, tomorrowResetTime()),
+    };
+  }
+
   // Layer 1: IP limit
   const ipCheck = await checkIpLimit(redis, ip);
   if (!ipCheck.allowed) {
@@ -221,9 +229,12 @@ function buildHeaders(remaining: number, resetAt: string): RateLimitHeaders {
  * Get current credit usage for a user (for display purposes).
  */
 export async function getUserCredits(
-  redis: Redis,
+  redis: Redis | null,
   userId: string
 ): Promise<{ used: number; limit: number; remaining: number }> {
+  if (!redis) {
+    return { used: 0, limit: DAILY_USER_LIMIT, remaining: DAILY_USER_LIMIT };
+  }
   const key = `rate:user:${userId}:${todayKey()}`;
   const used = ((await redis.get<number>(key)) ?? 0);
   return {

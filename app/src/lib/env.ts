@@ -23,10 +23,12 @@ const serverSchema = z.object({
     .min(1, "FIREBASE_PRIVATE_KEY is required"),
   KV_REST_API_URL: z
     .string()
-    .min(1, "KV_REST_API_URL is required"),
+    .optional()
+    .default(""),
   KV_REST_API_TOKEN: z
     .string()
-    .min(1, "KV_REST_API_TOKEN is required"),
+    .optional()
+    .default(""),
 });
 
 /**
