@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>GitGood Developer Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2463eb",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#111621",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen">
+<div class="flex">
+<!-- Sidebar -->
+<aside class="w-64 h-screen sticky top-0 bg-white dark:bg-background-dark border-r border-slate-200 dark:border-slate-800 flex flex-col">
+<div class="p-6">
+<div class="flex items-center gap-2 text-primary font-bold text-2xl tracking-tight">
+<span class="material-icons">code</span>
+<span>GitGood</span>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-primary bg-primary/10 rounded-lg font-medium transition-colors" href="#">
+<span class="material-icons">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg font-medium transition-colors" href="#">
+<span class="material-icons">school</span>
+<span>My Learning</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg font-medium transition-colors" href="#">
+<span class="material-icons">explore</span>
+<span>Browse</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg font-medium transition-colors" href="#">
+<span class="material-icons">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl flex items-center gap-4">
+<div class="relative flex items-center justify-center">
+<svg class="w-12 h-12 transform -rotate-90">
+<circle class="text-slate-200 dark:text-slate-700" cx="24" cy="24" fill="transparent" r="20" stroke="currentColor" stroke-width="3"></circle>
+<circle class="text-primary" cx="24" cy="24" fill="transparent" r="20" stroke="currentColor" stroke-dasharray="125.6" stroke-dashoffset="79.1" stroke-width="3"></circle>
+</svg>
+<span class="absolute text-[10px] font-bold">37%</span>
+</div>
+<div>
+<p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Credits</p>
+<p class="text-sm font-bold">37 / 100</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 p-8">
+<header class="mb-8 flex justify-between items-center">
+<div>
+<h1 class="text-2xl font-bold text-slate-900 dark:text-white">Welcome back, Alex! 👋</h1>
+<p class="text-slate-500 dark:text-slate-400">Your AI mentor has analyzed 4 new commits in your tracked repos.</p>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
+<span class="material-icons">notifications</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+<img alt="Profile" class="w-full h-full object-cover" data-alt="User profile avatar of a developer" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIk8ZC7XhiAAxnHPQbLL9rr8oMcS0_Y2lW8o9cugMj8DiQ-A2Sp6JTGdGvsU_6LyIumpdbf8wU1m_zVUFNBosV9i3ybxOBJugKoux8iiUz3v3Q5pGdEe9K18l6d647BY8139RrP6Spzm7K-arZQh9ZjAO0EIzebap1eAiD-MWhikkUw9yjn2FaGTsiDb2TkNzrE0rs3sjoQOTeLJkIY4dFHlsjQuTwHpKrubYABelxGtuKgzT6Zr9vDvi1sLm9rGH-cKgw5LBZrSg"/>
+</div>
+</div>
+</header>
+<!-- Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 flex items-center justify-center">
+<span class="material-icons">done_all</span>
+</div>
+<div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Topics Completed</p>
+<h3 class="text-2xl font-bold">12</h3>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-orange-50 dark:bg-orange-900/20 text-orange-600 flex items-center justify-center">
+<span class="material-icons">local_fire_department</span>
+</div>
+<div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Daily Streak</p>
+<h3 class="text-2xl font-bold">5 Days</h3>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-600 flex items-center justify-center">
+<span class="material-icons">timer</span>
+</div>
+<div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Time Invested</p>
+<h3 class="text-2xl font-bold">14.5h</h3>
+</div>
+</div>
+</div>
+<!-- Hero Section: Continue Learning -->
+<div class="mb-8">
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col md:flex-row">
+<div class="md:w-1/3 bg-slate-100 dark:bg-slate-800 relative min-h-[200px]">
+<img alt="Course Hero" class="absolute inset-0 w-full h-full object-cover" data-alt="React logo icon on dark blue background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHVzoNlbmQOBDrWtH_A5pvNmN5TRVyEWZHaeUrDR56UIEnMrcKAdRfls_U1PtNGXWdSmlFtt-iXehgTREPrfGc0U1J5NLATWL0y0vLHZlkEG95Ro7IkFuw2jeRmWBWzM0ggjkRRYOdZdlFKnWTee9S6BOxrVkggeSzv4r38BVPsstfvGPWWoocMP5jbgDbwlEtFv_RMPv5gKyNrg-7rM41Ao1kryDcJuYyCZiuaUpza6tva9ENkO_rQvcXuc1mo3a6IbyFzEpjhZ4"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
+<span class="px-3 py-1 bg-primary text-white text-xs font-bold rounded-full">ACTIVE</span>
+</div>
+</div>
+<div class="md:w-2/3 p-8 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-2 mb-2">
+<span class="material-icons text-slate-400 text-sm">folder</span>
+<span class="text-sm font-medium text-slate-500">facebook/react</span>
+</div>
+<h2 class="text-2xl font-bold mb-4">Deep Dive into Fiber Architecture</h2>
+<p class="text-slate-600 dark:text-slate-400 mb-6 max-w-2xl leading-relaxed"> Master the internals of React's reconciliation algorithm. Understand how scheduling, priority, and concurrent mode work under the hood. </p>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between text-sm font-medium">
+<span class="text-slate-500 uppercase tracking-tight">Progress</span>
+<span class="text-primary font-bold">34%</span>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2">
+<div class="bg-primary h-2 rounded-full" style="width: 34%"></div>
+</div>
+<div class="flex justify-end pt-2">
+<button class="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-lg font-bold flex items-center gap-2 transition-transform active:scale-95 shadow-lg shadow-primary/20">
+                                    Continue Learning
+                                    <span class="material-icons text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Learning Paths Grid -->
+<section>
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-xl font-bold">Your Learning Paths</h2>
+<a class="text-primary text-sm font-bold hover:underline flex items-center gap-1" href="#">
+                        View all <span class="material-icons text-xs">open_in_new</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Path Card 1 -->
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-xl hover:shadow-xl transition-shadow group">
+<div class="flex justify-between items-start mb-4">
+<div class="flex flex-col">
+<div class="flex items-center gap-1 text-slate-400 text-xs mb-1">
+<span class="material-icons text-xs">star</span>
+<span>23.4k</span>
+</div>
+<h4 class="font-bold text-lg group-hover:text-primary transition-colors truncate">tailwindlabs/tailwindcss</h4>
+</div>
+<div class="relative flex items-center justify-center w-14 h-14">
+<svg class="w-14 h-14 transform -rotate-90">
+<circle class="text-slate-100 dark:text-slate-800" cx="28" cy="28" fill="transparent" r="24" stroke="currentColor" stroke-width="4"></circle>
+<circle class="text-primary" cx="28" cy="28" fill="transparent" r="24" stroke="currentColor" stroke-dasharray="150.8" stroke-dashoffset="30.2" stroke-width="4"></circle>
+</svg>
+<span class="absolute text-xs font-bold">80%</span>
+</div>
+</div>
+<p class="text-sm text-slate-500 dark:text-slate-400 mb-4 line-clamp-2">Efficiently styling components with utility-first CSS principles.</p>
+<div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
+<span class="text-xs font-semibold text-slate-400">12 Modules</span>
+<button class="text-primary text-xs font-bold hover:underline">RESUME</button>
+</div>
+</div>
+<!-- Path Card 2 -->
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-xl hover:shadow-xl transition-shadow group">
+<div class="flex justify-between items-start mb-4">
+<div class="flex flex-col">
+<div class="flex items-center gap-1 text-slate-400 text-xs mb-1">
+<span class="material-icons text-xs">star</span>
+<span>108.2k</span>
+</div>
+<h4 class="font-bold text-lg group-hover:text-primary transition-colors truncate">vercel/next.js</h4>
+</div>
+<div class="relative flex items-center justify-center w-14 h-14">
+<svg class="w-14 h-14 transform -rotate-90">
+<circle class="text-slate-100 dark:text-slate-800" cx="28" cy="28" fill="transparent" r="24" stroke="currentColor" stroke-width="4"></circle>
+<circle class="text-primary" cx="28" cy="28" fill="transparent" r="24" stroke="currentColor" stroke-dasharray="150.8" stroke-dashoffset="128.2" stroke-width="4"></circle>
+</svg>
+<span class="absolute text-xs font-bold">15%</span>
+</div>
+</div>
+<p class="text-sm text-slate-500 dark:text-slate-400 mb-4 line-clamp-2">Optimizing performance with App Router and Server Components.</p>
+<div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
+<span class="text-xs font-semibold text-slate-400">18 Modules</span>
+<button class="text-primary text-xs font-bold hover:underline">RESUME</button>
+</div>
+</div>
+<!-- Path Card 3 -->
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-xl hover:shadow-xl transition-shadow group">
+<div class="flex justify-between items-start mb-4">
+<div class="flex flex-col">
+<div class="flex items-center gap-1 text-slate-400 text-xs mb-1">
+<span class="material-icons text-xs">star</span>
+<span>45.1k</span>
+</div>
+<h4 class="font-bold text-lg group-hover:text-primary transition-colors truncate">trpc/trpc</h4>
+</div>
+<div class="relative flex items-center justify-center w-14 h-14">
+<svg class="w-14 h-14 transform -rotate-90">
+<circle class="text-slate-100 dark:text-slate-800" cx="28" cy="28" fill="transparent" r="24" stroke="currentColor" stroke-width="4"></circle>
+<circle class="text-primary" cx="28" cy="28" fill="transparent" r="24" stroke="currentColor" stroke-dasharray="150.8" stroke-dashoffset="60.3" stroke-width="4"></circle>
+</svg>
+<span class="absolute text-xs font-bold">60%</span>
+</div>
+</div>
+<p class="text-sm text-slate-500 dark:text-slate-400 mb-4 line-clamp-2">End-to-end typesafe APIs without code generation.</p>
+<div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
+<span class="text-xs font-semibold text-slate-400">8 Modules</span>
+<button class="text-primary text-xs font-bold hover:underline">RESUME</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+</body></html>

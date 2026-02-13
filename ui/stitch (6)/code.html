@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>GitGood | User Settings &amp; Profile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary": "#2463eb",
+                "background-light": "#f6f6f8",
+                "background-dark": "#111621",
+              },
+              fontFamily: {
+                "display": ["Inter"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .sidebar-item-active {
+            @apply bg-primary/10 border-l-4 border-primary text-primary font-semibold;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<!-- Top Navigation Bar (Contextual) -->
+<header class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between h-16 items-center">
+<div class="flex items-center gap-2">
+<div class="bg-primary rounded-lg p-1.5">
+<span class="material-icons text-white text-xl">code</span>
+</div>
+<span class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">GitGood<span class="text-primary text-xs ml-0.5 uppercase tracking-widest">AI</span></span>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200">
+<span class="material-icons">notifications_none</span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700">
+<img alt="Profile" data-alt="User profile avatar close up" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA75snpQH2TPuJN_pOq7chwrj4Fj5TSlRB3v-a_Q5iakJRULkwlXCguuQwq1mFyE1e5Rf67Z2FsAf5UeOymTvX9EbZRr1s_qQakHLKEjaSs5q4AVso4mzZxjHOh_EYXCWQd0Oz38y6goKZWlEdQ5lMEfYo0g3jC8XIaQnv79Ax2apsbETEUBzILwcX_qsQH3Zqn7hIZvrohE8RQZvP4i1UX0c4Ue2fExuz42NrzrDvPBt9vQpJQbwsKuL_34Sf8kFmYqYSRROPm-hg"/>
+</div>
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+<div class="lg:grid lg:grid-cols-12 lg:gap-x-12">
+<!-- Left Sidebar Navigation -->
+<aside class="hidden lg:block lg:col-span-3">
+<nav class="space-y-1">
+<a class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg bg-primary/10 text-primary border-l-4 border-primary" href="#">
+<span class="material-icons mr-3 text-xl">person</span>
+                        Public Profile
+                    </a>
+<a class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors" href="#">
+<span class="material-icons mr-3 text-xl">settings</span>
+                        Account Preferences
+                    </a>
+<a class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors" href="#">
+<span class="material-icons mr-3 text-xl">credit_card</span>
+                        Credits &amp; Billing
+                    </a>
+<a class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors" href="#">
+<span class="material-icons mr-3 text-xl">security</span>
+                        Security &amp; Privacy
+                    </a>
+<a class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors" href="#">
+<span class="material-icons mr-3 text-xl">extension</span>
+                        Integrations
+                    </a>
+</nav>
+<!-- Billing Summary Teaser -->
+<div class="mt-10 p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Plan Details</h4>
+<span class="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">Pro</span>
+</div>
+<p class="text-sm font-medium text-slate-900 dark:text-white mb-2">500 Credits remaining</p>
+<div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 mb-4">
+<div class="bg-primary h-1.5 rounded-full" style="width: 65%"></div>
+</div>
+<button class="w-full text-xs font-semibold py-2 px-4 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                        Upgrade Credits
+                    </button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<div class="lg:col-span-9 space-y-8">
+<!-- Profile Section -->
+<section class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+<div class="px-6 py-6 border-b border-slate-100 dark:border-slate-800">
+<h2 class="text-lg font-bold text-slate-900 dark:text-white">Profile Information</h2>
+<p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Update your personal details and how you appear to the community.</p>
+</div>
+<div class="p-6 space-y-8">
+<!-- Avatar Upload -->
+<div class="flex items-center space-x-6">
+<div class="relative group">
+<div class="h-24 w-24 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden ring-4 ring-slate-50 dark:ring-slate-800">
+<img alt="User Avatar" class="h-full w-full object-cover" data-alt="Large user profile picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8Qj_rAjjlLVmennAb8sfSszXqMXCHPXS9Kf7kNXYj-VRTH5kTUVIdTRLNbMc20KXwtMqlN1GWmTSl_8Bu4iVMw_ZHhpHaYG7aZTHMIe0M7INQP5zes1XT_LfUU8G2c0wY6DqwkpiDk_4CPpd8imjRoU9cjl1HYLHF2VUtTbc30DQc1eSYDntzieiPAoG-Q3NBIWiISwBYBwvX3PWq1x7qKAgCXYWzwNejEbeX9_nt5rhD_h7MVeTgeR81OH-IyOFam49TbP0Dpn0"/>
+</div>
+<label class="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full text-white opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity">
+<span class="material-icons">photo_camera</span>
+</label>
+</div>
+<div class="space-y-2">
+<h3 class="text-sm font-semibold text-slate-900 dark:text-white">Profile Picture</h3>
+<div class="flex gap-2">
+<button class="text-xs font-semibold px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors">Change Photo</button>
+<button class="text-xs font-semibold px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">Remove</button>
+</div>
+<p class="text-xs text-slate-400">JPG, GIF or PNG. Max size of 2MB.</p>
+</div>
+</div>
+<!-- Form Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Full Name</label>
+<input class="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm outline-none" type="text" value="Alex Rivera"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Email Address</label>
+<div class="relative">
+<input class="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-400 text-sm outline-none cursor-not-allowed" disabled="" type="email" value="alex.rivera@gitgood.ai"/>
+<div class="absolute inset-y-0 right-0 flex items-center pr-3">
+<span class="material-icons text-emerald-500 text-sm">verified</span>
+</div>
+</div>
+</div>
+<div class="space-y-2 md:col-span-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Bio</label>
+<textarea class="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm outline-none resize-none" rows="4">Full-stack developer passionate about building AI-driven productivity tools. Currently mastering Rust and exploring open-source LLM frameworks.</textarea>
+<p class="text-xs text-right text-slate-400">142 / 300 characters</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Preferences Section -->
+<section class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+<div class="px-6 py-6 border-b border-slate-100 dark:border-slate-800">
+<h2 class="text-lg font-bold text-slate-900 dark:text-white">Learning Preferences</h2>
+<p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Tailor the AI tutor's tone and difficulty to your expertise.</p>
+</div>
+<div class="p-6 space-y-8">
+<!-- Experience Level Toggle -->
+<div class="space-y-4">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Experience Level</label>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+<button class="flex items-center justify-center px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
+                                    Junior
+                                </button>
+<button class="flex items-center justify-center px-4 py-3 rounded-xl border-2 border-primary bg-primary/5 text-primary text-sm font-bold shadow-sm">
+                                    Mid-level
+                                </button>
+<button class="flex items-center justify-center px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
+                                    Senior/Lead
+                                </button>
+</div>
+</div>
+<!-- Theme Selection -->
+<div class="space-y-4">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Learning Track Mode</label>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<label class="relative flex items-center p-4 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
+<input checked="" class="h-4 w-4 text-primary border-slate-300 focus:ring-primary" name="learning_theme" type="radio"/>
+<div class="ml-4">
+<p class="text-sm font-bold text-slate-900 dark:text-white">Standard Curriculum</p>
+<p class="text-xs text-slate-500">Comprehensive end-to-end repository deep dives.</p>
+</div>
+</label>
+<label class="relative flex items-center p-4 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
+<input class="h-4 w-4 text-primary border-slate-300 focus:ring-primary" name="learning_theme" type="radio"/>
+<div class="ml-4">
+<p class="text-sm font-bold text-slate-900 dark:text-white">Quick Start</p>
+<p class="text-xs text-slate-500">Fast-paced, high-level summaries and code snippets.</p>
+</div>
+</label>
+</div>
+</div>
+</div>
+</section>
+<!-- Form Actions -->
+<div class="flex items-center justify-end gap-3 pt-2">
+<button class="px-6 py-2.5 rounded-lg text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                        Cancel
+                    </button>
+<button class="px-8 py-2.5 rounded-lg bg-primary text-white text-sm font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 transform active:scale-95 transition-all">
+                        Save Changes
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer for context -->
+<footer class="mt-20 border-t border-slate-200 dark:border-slate-800 py-12">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex items-center gap-2">
+<div class="bg-slate-200 dark:bg-slate-800 rounded-lg p-1.5">
+<span class="material-icons text-slate-600 dark:text-slate-400 text-sm">code</span>
+</div>
+<span class="text-sm font-semibold text-slate-500 dark:text-slate-400">© 2024 GitGood AI Learning Inc.</span>
+</div>
+<div class="flex gap-6 text-sm text-slate-500 dark:text-slate-400 font-medium">
+<a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="hover:text-primary transition-colors" href="#">Support</a>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

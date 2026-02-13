@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>GitGood | Curated Learning Paths</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary": "#2463eb",
+                "background-light": "#f6f6f8",
+                "background-dark": "#111621",
+              },
+              fontFamily: {
+                "display": ["Inter", "sans-serif"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+          },
+        }
+      </script>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<!-- Navigation Bar -->
+<nav class="sticky top-0 z-50 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-16">
+<div class="flex items-center gap-2">
+<div class="bg-primary p-1.5 rounded-lg">
+<span class="material-icons text-white text-xl">code</span>
+</div>
+<span class="text-xl font-bold tracking-tight">GitGood</span>
+</div>
+<div class="hidden md:flex items-center space-x-8">
+<a class="text-sm font-medium text-primary" href="#">Browse</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors" href="#">My Learning</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors" href="#">Resources</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+<span class="material-icons">notifications</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center overflow-hidden">
+<img alt="User Profile" class="h-full w-full object-cover" data-alt="User profile avatar portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvRJ8MXRna0sA_4-rfJBq1UFVxRZWV3uyCkoFSynmD5txBra-CK8ydAMkBnc4R462O-j9WFuehhfsJ_qEDxzDqRvGTpHaLeH7CVUbzlieqBl9wVcs57CnuQ1-SNyayeL3P9RUU17-X_UnFLkRZ27MU0yfsyhxo3Cg8CCb2R8uT2jws2FYcCeXKO2KDSetKl_PmXitu1xWYLChcpJD6fDXWFnNRQ6glv7nZsJ8JcbICXUg54OOEDMKefs561HdedClgU2bH7TVLyoM"/>
+</div>
+</div>
+</div>
+</div>
+</nav>
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<!-- Header Section -->
+<header class="mb-10 text-center md:text-left">
+<h1 class="text-3xl md:text-4xl font-extrabold mb-3 tracking-tight">Curated Learning Paths</h1>
+<p class="text-slate-600 dark:text-slate-400 max-w-2xl">
+                Master complex codebases with AI-driven documentation and structured curriculum built directly from the source.
+            </p>
+</header>
+<!-- Search & Filter Bar -->
+<div class="space-y-6 mb-8">
+<div class="flex flex-col md:flex-row gap-4 items-center">
+<div class="relative flex-1 w-full">
+<span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none" placeholder="Search repositories by name, language or topic..." type="text"/>
+</div>
+<div class="flex gap-2 w-full md:w-auto">
+<select class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-primary">
+<option>Sort by: Popularity</option>
+<option>Sort by: Newest</option>
+<option>Sort by: Stars</option>
+</select>
+</div>
+</div>
+<!-- Filter Chips -->
+<div class="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
+<button class="px-5 py-2 bg-primary text-white text-sm font-semibold rounded-full whitespace-nowrap">All Topics</button>
+<button class="px-5 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-primary hover:text-primary text-sm font-medium rounded-full whitespace-nowrap transition-all">Machine Learning</button>
+<button class="px-5 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-primary hover:text-primary text-sm font-medium rounded-full whitespace-nowrap transition-all">Web Dev</button>
+<button class="px-5 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-primary hover:text-primary text-sm font-medium rounded-full whitespace-nowrap transition-all">Systems Design</button>
+<button class="px-5 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-primary hover:text-primary text-sm font-medium rounded-full whitespace-nowrap transition-all">Blockchain</button>
+<button class="px-5 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-primary hover:text-primary text-sm font-medium rounded-full whitespace-nowrap transition-all">Data Science</button>
+<button class="px-5 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-primary hover:text-primary text-sm font-medium rounded-full whitespace-nowrap transition-all">Mobile App</button>
+</div>
+</div>
+<!-- Repository Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<!-- Repo Card 1 (Active) -->
+<div class="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300">
+<div class="relative h-48">
+<img alt="Repo Banner" class="w-full h-full object-cover" data-alt="Abstract dark code interface visual" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBTucsXO5qmYGTIFaqTdPw0J0tJW7fF5z-tgZ_FmJXOIWFlxPjE9zH3AnoPv58K34uwXKgp-YLyNW807glYVFdVCG1j6Ukw2CT_CSGwewJV6APVTEl7eB1xOLS4ZkiewPn6kGb7LWQqW9A2CXM43T4MZCc4KL-WwF3Cwej09LZfPuk-kElry0jfct6ED4oVBFLhNq-XWTHulyUsL8LfgDDMPhFjixFYahZTfSllQv6kghVO0f-7EbJ6hldT7_ZRQJUPm1fyOJLEU0"/>
+<div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
+<div class="absolute top-4 left-4">
+<span class="bg-primary text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded">Curated</span>
+</div>
+<!-- Progress Ring (Active Path) -->
+<div class="absolute top-4 right-4 bg-white/10 backdrop-blur-md rounded-full p-1 border border-white/20">
+<div class="relative flex items-center justify-center w-12 h-12">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-white/20" cx="24" cy="24" fill="transparent" r="20" stroke="currentColor" stroke-width="3"></circle>
+<circle class="text-primary" cx="24" cy="24" fill="transparent" r="20" stroke="currentColor" stroke-dasharray="125.6" stroke-dashoffset="40" stroke-width="3"></circle>
+</svg>
+<span class="absolute text-[10px] font-bold text-white">68%</span>
+</div>
+</div>
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-3">
+<h3 class="font-bold text-lg group-hover:text-primary transition-colors">tensorflow/tensorflow</h3>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 mb-6">
+                        An Open Source Machine Learning Framework for Everyone. Dive into deep learning fundamentals and production deployment.
+                    </p>
+<div class="flex items-center gap-4 text-xs font-medium text-slate-500 dark:text-slate-400 mb-6">
+<div class="flex items-center gap-1">
+<span class="material-icons text-sm text-amber-500">star</span>
+<span>175k</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-icons text-sm text-primary">groups</span>
+<span>24k learners</span>
+</div>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="bg-primary/10 text-primary text-[11px] px-2 py-0.5 rounded font-semibold uppercase">C++</span>
+<span class="bg-primary/10 text-primary text-[11px] px-2 py-0.5 rounded font-semibold uppercase">Python</span>
+</div>
+</div>
+<!-- Hover Overlay -->
+<div class="absolute inset-0 bg-primary/95 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-4 text-white">
+<p class="font-medium">Continue where you left off</p>
+<button class="bg-white text-primary px-8 py-3 rounded-lg font-bold hover:scale-105 transition-transform">
+                        Continue Learning
+                    </button>
+</div>
+</div>
+<!-- Repo Card 2 -->
+<div class="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300">
+<div class="relative h-48">
+<img alt="Repo Banner" class="w-full h-full object-cover" data-alt="Clean computer code on screen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvkc4XvOBDIqGtrF6l4F4egRo1qcs0zRJFY-FLAdxzEEKrii7CC9PXjAbSeZOafRIsco-6tevXRbh0OnS-PybR8q5wlUmgPl2AohSb5XfidxTP6WMwCSYfR1QWbVAHSxfqs7mTNrUMMFyQAnRp94xXKDT6RQkXcFV6MHUCRUo0HuMNQfZAl8_zMGiND2HE5oprw9c4-kauzYiuP9OgYeXjwLoQzmp5pIEDZxCR-di0mxhN3WVl_zvfz7pqWdXQ-lSX80-CG6x-Flo"/>
+<div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
+<div class="absolute top-4 left-4">
+<span class="bg-primary text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded">Curated</span>
+</div>
+</div>
+<div class="p-6">
+<h3 class="font-bold text-lg mb-3 group-hover:text-primary transition-colors">facebook/react</h3>
+<p class="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 mb-6">
+                        A JavaScript library for building user interfaces. Master the reconciliation algorithm and fiber architecture.
+                    </p>
+<div class="flex items-center gap-4 text-xs font-medium text-slate-500 dark:text-slate-400 mb-6">
+<div class="flex items-center gap-1">
+<span class="material-icons text-sm text-amber-500">star</span>
+<span>212k</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-icons text-sm text-primary">groups</span>
+<span>45k learners</span>
+</div>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="bg-primary/10 text-primary text-[11px] px-2 py-0.5 rounded font-semibold uppercase">JavaScript</span>
+<span class="bg-primary/10 text-primary text-[11px] px-2 py-0.5 rounded font-semibold uppercase">React</span>
+</div>
+</div>
+<div class="absolute inset-0 bg-primary/95 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-4 text-white">
+<p class="font-medium text-center px-6">Explore the world's most popular UI library</p>
+<button class="bg-white text-primary px-8 py-3 rounded-lg font-bold hover:scale-105 transition-transform">
+                        Start Learning
+                    </button>
+</div>
+</div>
+<!-- Repo Card 3 -->
+<div class="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300">
+<div class="relative h-48">
+<img alt="Repo Banner" class="w-full h-full object-cover" data-alt="Network servers hardware glowing" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOa_yajRm4RLBkGjy4wLVHwFH4tkYMq6HPv0yLdgZG8ZGr7zqdxTAvM9UQOPrd7NtMDbcPBGKyaXUbygSyWrT2Ze-jomoEbg5LntY8LZzbM_VldVq8RrZtrILX3Da_HxFqDiVCf8Ie3SzXxNTCzn39gnZj6WlmIJJFru2ND9KyPI1VclcfjLMJUuTZTHzgZGrJRHnp7bUHJrw84xXpCvEh_n5fs_t8Cx9QhjD0EKfJNxM-oaa5Z-af4dhuj-ysYrYEADnV1Gd3JHM"/>
+<div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
+<div class="absolute top-4 left-4">
+<span class="bg-primary text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded">Curated</span>
+</div>
+</div>
+<div class="p-6">
+<h3 class="font-bold text-lg mb-3 group-hover:text-primary transition-colors">kubernetes/kubernetes</h3>
+<p class="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 mb-6">
+                        Production-Grade Container Scheduling and Management. Learn distributed systems and cloud-native architecture.
+                    </p>
+<div class="flex items-center gap-4 text-xs font-medium text-slate-500 dark:text-slate-400 mb-6">
+<div class="flex items-center gap-1">
+<span class="material-icons text-sm text-amber-500">star</span>
+<span>98k</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-icons text-sm text-primary">groups</span>
+<span>15k learners</span>
+</div>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="bg-primary/10 text-primary text-[11px] px-2 py-0.5 rounded font-semibold uppercase">Go</span>
+<span class="bg-primary/10 text-primary text-[11px] px-2 py-0.5 rounded font-semibold uppercase">Cloud</span>
+</div>
+</div>
+<div class="absolute inset-0 bg-primary/95 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-4 text-white">
+<p class="font-medium">Master the backbone of the cloud</p>
+<button class="bg-white text-primary px-8 py-3 rounded-lg font-bold hover:scale-105 transition-transform">
+                        Start Learning
+                    </button>
+</div>
+</div>
+<!-- Repo Card 4 -->
+<div class="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300">
+<div class="relative h-48">
+<img alt="Repo Banner" class="w-full h-full object-cover" data-alt="Modern web design layout mockup" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBR0eQMdU1TnwGKms9wKXQswJjQQF9nT9a0azUPpXKDAxA4USrsqlhNHqXBKGeKju-ly8sQDjDZLujIRgcBLfmBVWrmpJD1ElOKGZd5so1e5qsctVwfIi7a7lmjXW6_6fBwQ5uWJKTN8oqhgEWopl0dAoadOE27tAA4-JzGw47DAL65nhrdHipE5etFXFb8MZ3MoZZesiUT7Jz286nFXHw8S6uQvMYFZZT00B1I61pUSizitr76AhX7CRsK7rJheeFE91u7pE5LLSg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
+<div class="absolute top-4 left-4">
+<span class="bg-primary text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded">Curated</span>
+</div>
+</div>
+<div class="p-6">
+<h3 class="font-bold text-lg mb-3 group-hover:text-primary transition-colors">tailwindlabs/tailwindcss</h3>
+<p class="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 mb-6">
+                        A utility-first CSS framework for rapid UI development. Deep dive into the compiler and JIT engine.
+                    </p>
+<div class="flex items-center gap-4 text-xs font-medium text-slate-500 dark:text-slate-400 mb-6">
+<div class="flex items-center gap-1">
+<span class="material-icons text-sm text-amber-500">star</span>
+<span>72k</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-icons text-sm text-primary">groups</span>
+<span>8k learners</span>
+</div>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="bg-primary/10 text-primary text-[11px] px-2 py-0.5 rounded font-semibold uppercase">CSS</span>
+<span class="bg-primary/10 text-primary text-[11px] px-2 py-0.5 rounded font-semibold uppercase">PostCSS</span>
+</div>
+</div>
+<div class="absolute inset-0 bg-primary/95 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-4 text-white">
+<p class="font-medium">Build beautiful UIs faster</p>
+<button class="bg-white text-primary px-8 py-3 rounded-lg font-bold hover:scale-105 transition-transform">
+                        Start Learning
+                    </button>
+</div>
+</div>
+<!-- Repo Card 5 -->
+<div class="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300">
+<div class="relative h-48">
+<img alt="Repo Banner" class="w-full h-full object-cover" data-alt="Cyber security digital matrix background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwvucx83xWerY78dZ8eZLv9SCmaBO6lisYOE_lqy1WvkL_288FL4PyvVGfO2ckVsp5awH0HCy8zGQ3R85_L9hsDH4pzKvE21MMQcoWCOTl7b_r_3mpJ4XUdeQ49Lm3A-pJpA14psVAwsX1WtP24gS7cgUhT17c6g2AjrdYBAeeOgVO896IEQam7iZOGyOVh5YnIArd81Sc3Zb0adyA_WsRTc9QhRNO2o_GzqNV6fT9bpnSHW_bk9JODfwzGzIkkslwVmAFiQ2ZGHk"/>
+<div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
+<div class="absolute top-4 left-4">
+<span class="bg-primary text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded">Curated</span>
+</div>
+</div>
+<div class="p-6">
+<h3 class="font-bold text-lg mb-3 group-hover:text-primary transition-colors">bitcoin/bitcoin</h3>
+<p class="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 mb-6">
+                        Bitcoin Core integration/staging tree. Explore peer-to-peer networking and consensus mechanisms.
+                    </p>
+<div class="flex items-center gap-4 text-xs font-medium text-slate-500 dark:text-slate-400 mb-6">
+<div class="flex items-center gap-1">
+<span class="material-icons text-sm text-amber-500">star</span>
+<span>68k</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-icons text-sm text-primary">groups</span>
+<span>12k learners</span>
+</div>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="bg-primary/10 text-primary text-[11px] px-2 py-0.5 rounded font-semibold uppercase">C++</span>
+<span class="bg-primary/10 text-primary text-[11px] px-2 py-0.5 rounded font-semibold uppercase">Crypto</span>
+</div>
+</div>
+<div class="absolute inset-0 bg-primary/95 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-4 text-white">
+<p class="font-medium text-center px-4">The code that started it all</p>
+<button class="bg-white text-primary px-8 py-3 rounded-lg font-bold hover:scale-105 transition-transform">
+                        Start Learning
+                    </button>
+</div>
+</div>
+<!-- Repo Card 6 (In-Progress) -->
+<div class="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300">
+<div class="relative h-48">
+<img alt="Repo Banner" class="w-full h-full object-cover" data-alt="Vibrant tech hardware components" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAltBK44WTt55pK9xMZcYM1vNoMLZZb4g8mmyB72G1lDqd-JFu0nGOHS4tfHhqemLgJduFf95HOSnpd-t_ramnOa8N0zautb1Hy1RyFOgVw20ccCl2NCYyFbIP6eN_JCcxT-W-J4GwtfWKQQCatuQQMbnT-gJJORrr344VSvv2uC3S_BIch-BzYjcatRXar1nwhlwm6MWCFDgPHX69zWwRqQJe9ld7Tqi6VNWbA7fC0NveSH4Qe3ffehdznzTRK7N4fB7XX6qgd7N8"/>
+<div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
+<div class="absolute top-4 left-4">
+<span class="bg-primary text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded">Curated</span>
+</div>
+<div class="absolute top-4 right-4 bg-white/10 backdrop-blur-md rounded-full p-1 border border-white/20">
+<div class="relative flex items-center justify-center w-12 h-12">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-white/20" cx="24" cy="24" fill="transparent" r="20" stroke="currentColor" stroke-width="3"></circle>
+<circle class="text-primary" cx="24" cy="24" fill="transparent" r="20" stroke="currentColor" stroke-dasharray="125.6" stroke-dashoffset="110" stroke-width="3"></circle>
+</svg>
+<span class="absolute text-[10px] font-bold text-white">12%</span>
+</div>
+</div>
+</div>
+<div class="p-6">
+<h3 class="font-bold text-lg mb-3 group-hover:text-primary transition-colors">rust-lang/rust</h3>
+<p class="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 mb-6">
+                        Empowering everyone to build reliable and efficient software. Study memory safety and the borrow checker.
+                    </p>
+<div class="flex items-center gap-4 text-xs font-medium text-slate-500 dark:text-slate-400 mb-6">
+<div class="flex items-center gap-1">
+<span class="material-icons text-sm text-amber-500">star</span>
+<span>85k</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-icons text-sm text-primary">groups</span>
+<span>19k learners</span>
+</div>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="bg-primary/10 text-primary text-[11px] px-2 py-0.5 rounded font-semibold uppercase">Rust</span>
+<span class="bg-primary/10 text-primary text-[11px] px-2 py-0.5 rounded font-semibold uppercase">Systems</span>
+</div>
+</div>
+<div class="absolute inset-0 bg-primary/95 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-4 text-white">
+<p class="font-medium">Continue your systems journey</p>
+<button class="bg-white text-primary px-8 py-3 rounded-lg font-bold hover:scale-105 transition-transform">
+                        Continue Learning
+                    </button>
+</div>
+</div>
+</div>
+<!-- Pagination (Simple Placeholder) -->
+<div class="mt-12 flex justify-center items-center gap-2">
+<button class="p-2 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-400 hover:text-primary transition-colors">
+<span class="material-icons">chevron_left</span>
+</button>
+<button class="w-10 h-10 bg-primary text-white rounded-lg font-bold">1</button>
+<button class="w-10 h-10 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg font-medium transition-colors">2</button>
+<button class="w-10 h-10 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg font-medium transition-colors">3</button>
+<span class="px-2">...</span>
+<button class="w-10 h-10 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg font-medium transition-colors">12</button>
+<button class="p-2 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-400 hover:text-primary transition-colors">
+<span class="material-icons">chevron_right</span>
+</button>
+</div>
+</main>
+<!-- Simple Footer -->
+<footer class="border-t border-slate-200 dark:border-slate-800 py-12 mt-20">
+<div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex items-center gap-2 opacity-50">
+<div class="bg-slate-400 p-1 rounded">
+<span class="material-icons text-white text-sm">code</span>
+</div>
+<span class="text-sm font-bold tracking-tight">GitGood © 2024</span>
+</div>
+<div class="flex gap-8">
+<a class="text-xs font-medium text-slate-500 hover:text-primary" href="#">API Documentation</a>
+<a class="text-xs font-medium text-slate-500 hover:text-primary" href="#">Contributor Guide</a>
+<a class="text-xs font-medium text-slate-500 hover:text-primary" href="#">Terms of Service</a>
+</div>
+</div>
+</footer>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</body></html>

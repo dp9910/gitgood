@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>GitGood - Interactive Learning Interface</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2463eb",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#111621",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"],
+                        "mono": ["JetBrains Mono"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 h-screen overflow-hidden flex flex-col">
+<!-- Top Progress Bar -->
+<div class="h-1 w-full bg-primary/10">
+<div class="h-full bg-primary" style="width: 35%"></div>
+</div>
+<!-- Header / Navbar -->
+<header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between px-6 shrink-0">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-icons text-xl">school</span>
+</div>
+<span class="font-bold text-xl tracking-tight">GitGood<span class="text-primary">.ai</span></span>
+</div>
+<div class="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-2"></div>
+<div class="text-sm font-medium text-slate-500">Neural Networks 101</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+<span class="material-icons text-sm">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
+<img alt="User Profile" class="w-full h-full rounded-full object-cover" data-alt="Headshot of a software developer" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDp2_quVNkZshFxWyLzziOumZbb66KDEV-2K8eYOupTws545zZp_DNdXZIQuTV7bZ_-7peF-yxsddeRoZb0DwDtlv4eMEgceoMSl0PBGn0FOxdLaZsLxiqmNDqDq7TdfrLQgFuBGej9BCmh_2SWUQSaPmK-vQub8w85EDzGFOpV6ABVgTdzyuzxxf98w0G_2RujAjYz4C71HlPyGoBqYVrPPsltwb6-CGymwibsMzmvi_4md7USdNiGcTC3TtNi8KluhGE_zPmUmKg"/>
+</div>
+</div>
+</header>
+<main class="flex-1 flex overflow-hidden">
+<!-- Left Sidebar: Curriculum -->
+<aside class="w-72 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col shrink-0">
+<div class="p-4 border-b border-slate-200 dark:border-slate-800">
+<h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Course Curriculum</h2>
+</div>
+<nav class="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-1">
+<!-- Section 1 -->
+<div class="mb-2">
+<button class="w-full flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white font-semibold text-sm">
+<span class="flex items-center gap-2">
+<span class="material-icons text-sm">keyboard_arrow_down</span>
+                            Foundation Concepts
+                        </span>
+<span class="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded">2/5</span>
+</button>
+<div class="mt-1 space-y-0.5">
+<a class="flex items-center justify-between p-2 pl-8 rounded-lg text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800" href="#">
+<span class="flex items-center gap-2">
+<span class="material-icons text-green-500 text-sm">check_circle</span>
+                                Intro to Neural Nets
+                            </span>
+<span class="text-[10px] text-slate-400">5m</span>
+</a>
+<a class="flex items-center justify-between p-2 pl-8 rounded-lg text-sm bg-primary/5 text-primary border-l-2 border-primary font-medium" href="#">
+<span class="flex items-center gap-2">
+<span class="material-icons text-sm">play_circle</span>
+                                Backpropagation
+                            </span>
+<span class="text-[10px]">15m</span>
+</a>
+<a class="flex items-center justify-between p-2 pl-8 rounded-lg text-sm text-slate-400 dark:text-slate-500 cursor-not-allowed" href="#">
+<span class="flex items-center gap-2">
+<span class="material-icons text-sm">lock</span>
+                                Gradient Descent
+                            </span>
+<span class="text-[10px]">10m</span>
+</a>
+</div>
+</div>
+<!-- Section 2 -->
+<div class="mb-2">
+<button class="w-full flex items-center justify-between p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold text-sm">
+<span class="flex items-center gap-2">
+<span class="material-icons text-sm">keyboard_arrow_right</span>
+                            Advanced Architectures
+                        </span>
+</button>
+</div>
+<div class="mb-2">
+<button class="w-full flex items-center justify-between p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold text-sm">
+<span class="flex items-center gap-2">
+<span class="material-icons text-sm">keyboard_arrow_right</span>
+                            Optimization
+                        </span>
+</button>
+</div>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<div class="bg-primary/5 rounded-xl p-3 border border-primary/10">
+<div class="flex justify-between text-[11px] font-bold text-primary mb-1">
+<span>LEARNING STREAK</span>
+<span>12 DAYS</span>
+</div>
+<div class="h-1.5 w-full bg-primary/20 rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 80%"></div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Center: Content Area -->
+<section class="flex-1 flex flex-col bg-white dark:bg-slate-950 overflow-hidden">
+<!-- Content Header -->
+<div class="px-8 pt-8 pb-4 shrink-0">
+<nav class="flex items-center gap-2 text-xs text-slate-400 mb-4">
+<span>Foundation Concepts</span>
+<span class="material-icons text-[12px]">chevron_right</span>
+<span class="text-primary font-medium">Understanding Backpropagation</span>
+</nav>
+<h1 class="text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">Understanding Backpropagation</h1>
+</div>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto custom-scrollbar px-8">
+<div class="max-w-3xl prose prose-slate dark:prose-invert pb-12">
+<p class="text-lg text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
+                        Backpropagation is the core algorithm that makes deep learning possible. It is a method used to calculate the gradient of the loss function with respect to the weights in a neural network.
+                    </p>
+<h3 class="text-xl font-bold mt-8 mb-4">The Chain Rule</h3>
+<p class="mb-4">
+                        At its heart, backpropagation is just the chain rule of calculus applied to the computational graph of a neural network. By working backward from the output layer to the input layer, we can efficiently compute how much each weight contributed to the total error.
+                    </p>
+<div class="my-8 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="bg-slate-50 dark:bg-slate-900 px-4 py-2 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+<span class="text-[11px] font-mono font-bold text-slate-500 uppercase tracking-widest">pytorch_example.py</span>
+<button class="text-slate-400 hover:text-primary"><span class="material-icons text-sm">content_copy</span></button>
+</div>
+<pre class="p-4 bg-slate-900 text-slate-300 font-mono text-sm leading-6 overflow-x-auto"><code><span class="text-blue-400">import</span> torch
+
+<span class="text-slate-500"># Define a simple computational graph</span>
+x = torch.tensor(<span class="text-amber-300">1.0</span>, requires_grad=<span class="text-blue-400">True</span>)
+w = torch.tensor(<span class="text-amber-300">2.0</span>, requires_grad=<span class="text-blue-400">True</span>)
+b = torch.tensor(<span class="text-amber-300">3.0</span>, requires_grad=<span class="text-blue-400">True</span>)
+
+<span class="text-slate-500"># Forward pass</span>
+y = w * x + b
+
+<span class="text-slate-500"># Backward pass (Backpropagation)</span>
+y.backward()
+
+<span class="text-slate-500"># Gradients: dy/dw = x, dy/db = 1</span>
+print(w.grad) <span class="text-slate-500"># Output: tensor(1.)</span>
+print(b.grad) <span class="text-slate-500"># Output: tensor(1.)</span></code></pre>
+</div>
+<h3 class="text-xl font-bold mt-8 mb-4">Weight Updates</h3>
+<p class="mb-6">
+                        Once the gradients are calculated, we use them to update the weights. This is typically done using an optimizer like Stochastic Gradient Descent (SGD) or Adam. The goal is to move the weights in the direction that minimizes the loss.
+                    </p>
+<div class="p-6 bg-primary/5 border border-primary/20 rounded-xl flex gap-4 items-start">
+<span class="material-icons text-primary">info</span>
+<div>
+<p class="text-sm font-semibold text-primary mb-1">Concept Check</p>
+<p class="text-sm text-slate-600 dark:text-slate-400">Remember that backpropagation doesn't update the weights itself—it only calculates the gradients. The optimizer is responsible for the actual update step.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Content Footer / Navigation -->
+<div class="h-20 border-t border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between shrink-0 bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm">
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 font-medium text-sm transition-all">
+<span class="material-icons text-sm">arrow_back</span>
+                    Previous
+                </button>
+<div class="flex items-center gap-3">
+<button class="px-6 py-2.5 rounded-lg bg-primary text-white font-bold text-sm shadow-lg shadow-primary/25 hover:bg-primary/90 transition-all">
+                        Complete &amp; Continue
+                    </button>
+</div>
+</div>
+</section>
+<!-- Right: AI Tutor Chat Panel -->
+<aside class="w-80 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col shrink-0">
+<!-- AI Header -->
+<div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 bg-green-500 rounded-full"></div>
+<span class="font-bold text-sm">AI Tutor</span>
+</div>
+<div class="flex items-center gap-1.5 px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-full">
+<span class="material-icons text-[14px] text-amber-500">bolt</span>
+<span class="text-[11px] font-bold">42 Credits</span>
+</div>
+</div>
+<!-- Chat History -->
+<div class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+<!-- AI Bubble -->
+<div class="flex flex-col gap-1 max-w-[90%]">
+<div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-2xl rounded-tl-none text-sm text-slate-700 dark:text-slate-300">
+                        Hey there! I'm your AI tutor. Ready to dive into Backpropagation? I can explain the math, show more code, or give you a quick quiz.
+                    </div>
+<span class="text-[10px] text-slate-400 pl-1">2m ago</span>
+</div>
+<!-- User Bubble -->
+<div class="flex flex-col gap-1 items-end ml-auto max-w-[90%]">
+<div class="bg-primary p-3 rounded-2xl rounded-tr-none text-sm text-white shadow-sm">
+                        Can you explain the chain rule part again?
+                    </div>
+<span class="text-[10px] text-slate-400 pr-1">1m ago</span>
+</div>
+<!-- AI Bubble -->
+<div class="flex flex-col gap-1 max-w-[90%]">
+<div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-2xl rounded-tl-none text-sm text-slate-700 dark:text-slate-300">
+                        Think of it like a relay race. Each part of the network contributes to the final error. The chain rule tells us exactly how much "blame" to pass back to each previous step by multiplying the local rates of change.
+                    </div>
+<span class="text-[10px] text-slate-400 pl-1">Just now</span>
+</div>
+</div>
+<!-- AI Actions & Input -->
+<div class="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+<div class="flex flex-wrap gap-2 mb-3">
+<button class="px-3 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-[11px] font-bold text-primary hover:border-primary transition-colors flex items-center gap-1">
+<span class="material-icons text-[12px]">quiz</span> Quiz me
+                    </button>
+<button class="px-3 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-[11px] font-bold text-primary hover:border-primary transition-colors flex items-center gap-1">
+<span class="material-icons text-[12px]">lightbulb</span> ELI5
+                    </button>
+<button class="px-3 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-[11px] font-bold text-primary hover:border-primary transition-colors flex items-center gap-1">
+<span class="material-icons text-[12px]">functions</span> Math Help
+                    </button>
+</div>
+<div class="relative">
+<textarea class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 pr-10 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none resize-none" placeholder="Ask anything..." rows="2"></textarea>
+<button class="absolute right-2 bottom-2 p-1.5 bg-primary text-white rounded-lg hover:bg-primary/90">
+<span class="material-icons text-sm">send</span>
+</button>
+</div>
+</div>
+</aside>
+</main>
+<!-- Map Data for Reference (Hidden) -->
+<div data-location="San Francisco" style="display:none"></div>
+</body></html>

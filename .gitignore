@@ -1,0 +1,46 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment secrets
+.env
+.env.local
+.env.*.local
+
+# Node
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# Build
+dist/
+build/
+
+# Test
+coverage/
+
+# Vercel
+.vercel/
+
+# TypeScript
+*.tsbuildinfo
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Lock files (kept in app/.gitignore, but exclude from root)
+# app/package-lock.json is tracked intentionally
+
+# Stitch mockup screenshots (large PNGs, keep HTML only)
+ui/stitch*/screen.png
