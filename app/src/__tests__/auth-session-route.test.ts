@@ -23,10 +23,20 @@ vi.mock("@/lib/firebase-admin", () => ({
   }),
 }));
 
+// Mock user-profile module
+const mockGetOrCreateProfile = vi.fn();
+const mockStoreGithubToken = vi.fn();
+vi.mock("@/lib/user-profile", () => ({
+  getOrCreateProfile: (...args: unknown[]) => mockGetOrCreateProfile(...args),
+  storeGithubToken: (...args: unknown[]) => mockStoreGithubToken(...args),
+}));
+
 import { POST, DELETE } from "@/app/api/auth/session/route";
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockGetOrCreateProfile.mockResolvedValue({ uid: "user-1" });
+  mockStoreGithubToken.mockResolvedValue(undefined);
 });
 
 describe("POST /api/auth/session", () => {
@@ -70,7 +80,7 @@ describe("POST /api/auth/session", () => {
   });
 
   it("creates session cookie on valid token", async () => {
-    mockVerifyIdToken.mockResolvedValue({ uid: "user-1" });
+    mockVerifyIdToken.mockResolvedValue({ uid: "user-1", email: "test@test.com" });
     mockCreateSessionCookie.mockResolvedValue("session-cookie-value");
 
     const req = new NextRequest("http://localhost/api/auth/session", {
@@ -111,6 +121,64 @@ describe("POST /api/auth/session", () => {
     const setArgs = mockCookieStore.set.mock.calls[0];
     const cookieOptions = setArgs[2];
     expect(cookieOptions.httpOnly).toBe(true);
+  });
+
+  it("creates user profile on sign-in", async () => {
+    mockVerifyIdToken.mockResolvedValue({
+      uid: "user-1",
+      email: "test@test.com",
+      name: "Test User",
+      picture: "https://avatar.com/pic.jpg",
+    });
+    mockCreateSessionCookie.mockResolvedValue("cookie-val");
+
+    const req = new NextRequest("http://localhost/api/auth/session", {
+      method: "POST",
+      body: JSON.stringify({ idToken: "valid-token" }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    await POST(req);
+
+    expect(mockGetOrCreateProfile).toHaveBeenCalledWith("user-1", {
+      email: "test@test.com",
+      displayName: "Test User",
+      photoURL: "https://avatar.com/pic.jpg",
+      githubUsername: null,
+    });
+  });
+
+  it("stores GitHub token when provided", async () => {
+    mockVerifyIdToken.mockResolvedValue({ uid: "user-1" });
+    mockCreateSessionCookie.mockResolvedValue("cookie-val");
+
+    const req = new NextRequest("http://localhost/api/auth/session", {
+      method: "POST",
+      body: JSON.stringify({
+        idToken: "valid-token",
+        githubAccessToken: "gho_github_oauth_token",
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    await POST(req);
+
+    expect(mockStoreGithubToken).toHaveBeenCalledWith("user-1", "gho_github_oauth_token");
+  });
+
+  it("does not store token when githubAccessToken is missing", async () => {
+    mockVerifyIdToken.mockResolvedValue({ uid: "user-1" });
+    mockCreateSessionCookie.mockResolvedValue("cookie-val");
+
+    const req = new NextRequest("http://localhost/api/auth/session", {
+      method: "POST",
+      body: JSON.stringify({ idToken: "valid-token" }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    await POST(req);
+
+    expect(mockStoreGithubToken).not.toHaveBeenCalled();
   });
 });
 

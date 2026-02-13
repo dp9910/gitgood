@@ -25,6 +25,12 @@ vi.mock("../lib/github", () => ({
   fetchFileContent: (...args: unknown[]) => mockFetchFileContent(...args),
 }));
 
+const mockGetUserGithubToken = vi.fn();
+
+vi.mock("../lib/user-profile", () => ({
+  getUserGithubToken: (...args: unknown[]) => mockGetUserGithubToken(...args),
+}));
+
 import { POST } from "../app/api/sync-progress/route";
 import { requireAuth } from "../lib/auth-middleware";
 import { checkRateLimit } from "../lib/rate-limit";
@@ -53,6 +59,8 @@ beforeEach(() => {
     result: { allowed: true, remaining: 99 },
     headers: new Headers(),
   });
+
+  mockGetUserGithubToken.mockResolvedValue("gho_realtoken123");
 
   mockGetUserOctokit.mockReturnValue({
     rest: {
@@ -102,6 +110,37 @@ describe("POST /api/sync-progress", () => {
     expect(res.status).toBe(400);
     const data = await res.json();
     expect(data.error).toBe("invalid_json");
+  });
+
+  it("returns 401 when no GitHub token found", async () => {
+    mockGetUserGithubToken.mockResolvedValue(null);
+
+    const res = await POST(
+      makeRequest({
+        repoOwner: "karpathy",
+        repoName: "micrograd",
+        progress: { "Backprop": { status: "completed" } },
+      })
+    );
+
+    expect(res.status).toBe(401);
+    const data = await res.json();
+    expect(data.error).toBe("no_token");
+  });
+
+  it("uses getUserGithubToken to get the real token", async () => {
+    mockFetchFileContent.mockRejectedValue(new Error("Not found"));
+
+    await POST(
+      makeRequest({
+        repoOwner: "karpathy",
+        repoName: "micrograd",
+        progress: { "Backprop": { status: "completed" } },
+      })
+    );
+
+    expect(mockGetUserGithubToken).toHaveBeenCalledWith("user123");
+    expect(mockGetUserOctokit).toHaveBeenCalledWith("gho_realtoken123");
   });
 
   it("creates new progress file when none exists", async () => {

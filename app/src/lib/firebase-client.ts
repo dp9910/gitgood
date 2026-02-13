@@ -45,11 +45,15 @@ export async function signInWithGitHub() {
   const result = await signInWithPopup(authInstance, githubProvider);
   const idToken = await result.user.getIdToken();
 
-  // Send token to server to create httpOnly session cookie
+  // Extract GitHub OAuth access token from credential
+  const credential = GithubAuthProvider.credentialFromResult(result);
+  const githubAccessToken = credential?.accessToken ?? null;
+
+  // Send token to server to create httpOnly session cookie + store GitHub token
   const response = await fetch("/api/auth/session", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ idToken }),
+    body: JSON.stringify({ idToken, githubAccessToken }),
   });
 
   if (!response.ok) {

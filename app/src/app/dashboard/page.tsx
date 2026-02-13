@@ -2,63 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth-context";
+import SidebarLayout from "@/components/sidebar-layout";
 import {
-  type LearningPath,
-  type DashboardStats,
   type HeatmapDay,
   generateHeatmapData,
   getHeatmapColor,
-  calculateStreak,
 } from "@/lib/dashboard";
-
-// ---------- Mock data (will be replaced with real data from GitHub API) ----------
-
-const MOCK_PATHS: LearningPath[] = [
-  {
-    repoOwner: "karpathy",
-    repoName: "micrograd",
-    fullName: "karpathy/micrograd",
-    topicsCompleted: 8,
-    topicsTotal: 12,
-    lastTopic: "Understanding Backpropagation",
-    lastAccessedAt: new Date().toISOString(),
-    language: "Python",
-  },
-  {
-    repoOwner: "trekhleb",
-    repoName: "javascript-algorithms",
-    fullName: "trekhleb/javascript-algorithms",
-    topicsCompleted: 5,
-    topicsTotal: 35,
-    lastTopic: "Binary Search",
-    lastAccessedAt: new Date(Date.now() - 86400000).toISOString(),
-    language: "JavaScript",
-  },
-];
-
-function getMockStats(): DashboardStats {
-  return {
-    topicsCompleted: 47,
-    topicsThisWeek: 3,
-    streakDays: calculateStreak(getMockActivityDates()),
-    hoursInvested: 18.5,
-  };
-}
-
-function getMockActivityDates(): string[] {
-  const dates: string[] = [];
-  const now = new Date();
-  // Generate some activity for the last 2 weeks
-  for (let i = 0; i < 14; i++) {
-    const d = new Date(now);
-    d.setDate(d.getDate() - i);
-    if (Math.random() > 0.3) {
-      dates.push(d.toISOString());
-      if (Math.random() > 0.6) dates.push(d.toISOString()); // some days with 2+ activities
-    }
-  }
-  return dates;
-}
+import type { LearningPathEntry } from "@/lib/user-profile";
 
 // ---------- Sub-components ----------
 
@@ -81,7 +32,10 @@ function StatCard({
           {label}
         </span>
       </div>
-      <p className="text-3xl font-extrabold text-slate-900 dark:text-white" data-testid={`stat-${label.toLowerCase().replace(/\s/g, "-")}`}>
+      <p
+        className="text-3xl font-extrabold text-slate-900 dark:text-white"
+        data-testid={`stat-${label.toLowerCase().replace(/\s/g, "-")}`}
+      >
         {value}
       </p>
       {subtitle && (
@@ -95,7 +49,10 @@ function StatCard({
 
 function Heatmap({ data }: { data: HeatmapDay[] }) {
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6" data-testid="heatmap">
+    <div
+      className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6"
+      data-testid="heatmap"
+    >
       <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-4">
         Learning Activity
       </h3>
@@ -120,56 +77,151 @@ function Heatmap({ data }: { data: HeatmapDay[] }) {
   );
 }
 
+function ProgressRing({
+  progress,
+  size = 56,
+  strokeWidth = 5,
+}: {
+  progress: number;
+  size?: number;
+  strokeWidth?: number;
+}) {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (progress / 100) * circumference;
+
+  return (
+    <svg width={size} height={size} className="transform -rotate-90">
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        strokeWidth={strokeWidth}
+        fill="none"
+        className="stroke-slate-200 dark:stroke-slate-700"
+      />
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        strokeWidth={strokeWidth}
+        fill="none"
+        strokeDasharray={circumference}
+        strokeDashoffset={offset}
+        strokeLinecap="round"
+        className="stroke-primary transition-all"
+      />
+    </svg>
+  );
+}
+
 function LearningPathCard({
   path,
   onContinue,
 }: {
-  path: LearningPath;
+  path: LearningPathEntry;
   onContinue: () => void;
 }) {
-  const progress = Math.round(
-    (path.topicsCompleted / path.topicsTotal) * 100
-  );
+  const progress =
+    path.modulesTotal > 0
+      ? Math.round((path.modulesCompleted / path.modulesTotal) * 100)
+      : 0;
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 hover:shadow-md transition-shadow group">
-      <div className="flex items-start justify-between mb-3">
-        <div>
-          <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">
-            {path.fullName}
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex-1 min-w-0">
+          <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors truncate">
+            {path.repoOwner}/{path.repoName}
           </h3>
           <p className="text-xs text-slate-400 mt-0.5">
-            Last: {path.lastTopic}
+            {path.lastModuleTitle ? `Last: ${path.lastModuleTitle}` : path.level}
           </p>
         </div>
+        <ProgressRing progress={progress} />
+      </div>
+
+      <div className="flex items-center justify-between mb-3">
         <span className="text-[10px] px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-slate-500 font-mono">
           {path.language}
         </span>
-      </div>
-
-      {/* Progress bar */}
-      <div className="mb-3">
-        <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
-          <span>
-            {path.topicsCompleted} of {path.topicsTotal} topics
-          </span>
-          <span className="font-medium">{progress}%</span>
-        </div>
-        <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-primary rounded-full transition-all"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
+        <span className="text-xs text-slate-400 font-medium">
+          {path.modulesCompleted}/{path.modulesTotal} modules
+        </span>
       </div>
 
       <button
         onClick={onContinue}
         className="w-full px-4 py-2 bg-primary/5 text-primary font-bold text-sm rounded-lg hover:bg-primary/10 transition-colors flex items-center justify-center gap-2"
       >
-        Continue
+        {path.status === "to_learn" ? "Start" : "Continue"}
         <span className="material-icons text-sm">arrow_forward</span>
       </button>
+    </div>
+  );
+}
+
+function EmptyState() {
+  const router = useRouter();
+  return (
+    <div className="text-center py-16" data-testid="empty-state">
+      <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
+        <span className="material-icons text-4xl text-primary">school</span>
+      </div>
+      <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+        Start your learning journey
+      </h3>
+      <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 max-w-sm mx-auto">
+        Browse repositories to find something to learn, and we&apos;ll create a
+        personalized curriculum for you.
+      </p>
+      <button
+        onClick={() => router.push("/browse")}
+        className="px-6 py-3 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-colors inline-flex items-center gap-2"
+        data-testid="browse-btn"
+      >
+        Browse Repositories
+        <span className="material-icons text-sm">arrow_forward</span>
+      </button>
+    </div>
+  );
+}
+
+// ---------- Filter Tabs ----------
+
+type PathFilter = "active" | "completed" | "to_learn";
+
+function FilterTabs({
+  active,
+  onChange,
+  counts,
+}: {
+  active: PathFilter;
+  onChange: (f: PathFilter) => void;
+  counts: Record<PathFilter, number>;
+}) {
+  const tabs: { key: PathFilter; label: string }[] = [
+    { key: "active", label: "Active" },
+    { key: "completed", label: "Completed" },
+    { key: "to_learn", label: "To Learn" },
+  ];
+
+  return (
+    <div className="flex gap-1 mb-4" data-testid="filter-tabs">
+      {tabs.map((tab) => (
+        <button
+          key={tab.key}
+          onClick={() => onChange(tab.key)}
+          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+            active === tab.key
+              ? "bg-primary/10 text-primary"
+              : "text-slate-400 hover:text-slate-600"
+          }`}
+          data-testid={`tab-${tab.key}`}
+        >
+          {tab.label} ({counts[tab.key]})
+        </button>
+      ))}
     </div>
   );
 }
@@ -178,159 +230,197 @@ function LearningPathCard({
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [paths] = useState<LearningPath[]>(MOCK_PATHS);
-  const stats = getMockStats();
-  const activityDates = getMockActivityDates();
-  const heatmapData = generateHeatmapData(activityDates, 12);
+  const { userProfile, profileLoading } = useAuth();
+  const [filter, setFilter] = useState<PathFilter>("active");
 
-  // Find most recent path for "Continue Learning"
-  const continuePath = paths.length > 0
-    ? [...paths].sort(
-        (a, b) =>
-          new Date(b.lastAccessedAt).getTime() -
-          new Date(a.lastAccessedAt).getTime()
-      )[0]
-    : null;
+  const stats = userProfile?.stats;
+  const paths = userProfile?.learningPaths ?? [];
+
+  // Filter learning paths
+  const activePaths = paths.filter((p) => p.status === "active");
+  const completedPaths = paths.filter((p) => p.status === "completed");
+  const toLearnPaths = paths.filter((p) => p.status === "to_learn");
+
+  const filteredPaths =
+    filter === "active"
+      ? activePaths
+      : filter === "completed"
+      ? completedPaths
+      : toLearnPaths;
+
+  // Find most recently active path for "Continue Learning"
+  const continuePath =
+    activePaths.length > 0
+      ? [...activePaths].sort(
+          (a, b) =>
+            new Date(b.lastAccessedAt).getTime() -
+            new Date(a.lastAccessedAt).getTime()
+        )[0]
+      : null;
+
+  // Heatmap from lastActiveAt (simplified — in production, track per-day activity)
+  const heatmapData = generateHeatmapData(
+    stats?.lastActiveAt ? [stats.lastActiveAt] : [],
+    12
+  );
+
+  if (profileLoading) {
+    return (
+      <SidebarLayout>
+        <div className="flex items-center justify-center h-64" data-testid="loading">
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent" />
+        </div>
+      </SidebarLayout>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-background-light dark:bg-background-dark">
-      {/* Header */}
-      <header className="h-16 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between px-6">
-        <button
-          onClick={() => router.push("/")}
-          className="flex items-center gap-2 text-primary font-bold text-xl tracking-tight"
-        >
-          <span className="material-icons">code</span>
-          <span>GitGood</span>
-        </button>
-        <nav className="flex items-center gap-4">
-          <button
-            onClick={() => router.push("/browse")}
-            className="text-sm text-slate-500 hover:text-primary transition-colors font-medium"
-          >
-            Browse Repos
-          </button>
-        </nav>
-      </header>
+    <SidebarLayout>
+      {/* Stats Row */}
+      <div
+        className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"
+        data-testid="stats-row"
+      >
+        <StatCard
+          icon="check_circle"
+          label="Topics Completed"
+          value={(stats?.topicsCompleted ?? 0).toString()}
+        />
+        <StatCard
+          icon="local_fire_department"
+          label="Learning Streak"
+          value={`${stats?.currentStreak ?? 0} days`}
+        />
+        <StatCard
+          icon="timer"
+          label="Time Invested"
+          value={`${stats?.hoursInvested ?? 0}h`}
+        />
+      </div>
 
-      <main className="max-w-5xl mx-auto px-6 py-10">
-        {/* Welcome */}
-        <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white mb-8" data-testid="welcome">
-          Welcome back! 👋
-        </h1>
+      {/* Heatmap */}
+      <div className="mb-8">
+        <Heatmap data={heatmapData} />
+      </div>
 
-        {/* Stats Row */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8" data-testid="stats-row">
-          <StatCard
-            icon="check_circle"
-            label="Topics Completed"
-            value={stats.topicsCompleted.toString()}
-            subtitle={`+${stats.topicsThisWeek} this week`}
-          />
-          <StatCard
-            icon="local_fire_department"
-            label="Learning Streak"
-            value={`${stats.streakDays} days`}
-          />
-          <StatCard
-            icon="timer"
-            label="Time Invested"
-            value={`${stats.hoursInvested}h`}
-          />
-        </div>
-
-        {/* Heatmap */}
-        <div className="mb-8">
-          <Heatmap data={heatmapData} />
-        </div>
-
-        {/* Continue Learning */}
-        {continuePath && (
-          <div className="mb-8" data-testid="continue-section">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
-              Pick up where you left off
-            </h2>
-            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-8">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-                    {continuePath.fullName}
-                  </h3>
-                  <p className="text-sm text-slate-500 mt-1">
-                    Last topic: {continuePath.lastTopic}
-                  </p>
-                </div>
-                <span className="text-xs px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-slate-500 font-mono">
-                  {continuePath.language}
+      {/* Continue Learning Hero */}
+      {continuePath && (
+        <div className="mb-8" data-testid="continue-section">
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
+            Pick up where you left off
+          </h2>
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-8">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                  {continuePath.repoOwner}/{continuePath.repoName}
+                </h3>
+                <p className="text-sm text-slate-500 mt-1">
+                  {continuePath.lastModuleTitle
+                    ? `Last: ${continuePath.lastModuleTitle}`
+                    : continuePath.level}
+                </p>
+              </div>
+              <span className="text-xs px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-slate-500 font-mono">
+                {continuePath.language}
+              </span>
+            </div>
+            <div className="mb-4">
+              <div className="flex items-center justify-between text-sm text-slate-400 mb-1.5">
+                <span>
+                  {continuePath.modulesCompleted} of{" "}
+                  {continuePath.modulesTotal} modules
+                </span>
+                <span className="font-medium">
+                  {continuePath.modulesTotal > 0
+                    ? Math.round(
+                        (continuePath.modulesCompleted /
+                          continuePath.modulesTotal) *
+                          100
+                      )
+                    : 0}
+                  %
                 </span>
               </div>
-              <div className="mb-4">
-                <div className="flex items-center justify-between text-sm text-slate-400 mb-1.5">
-                  <span>
-                    {continuePath.topicsCompleted} of {continuePath.topicsTotal} topics
-                  </span>
-                  <span className="font-medium">
-                    {Math.round(
-                      (continuePath.topicsCompleted / continuePath.topicsTotal) * 100
-                    )}
-                    %
-                  </span>
-                </div>
-                <div className="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-primary rounded-full"
-                    style={{
-                      width: `${Math.round(
-                        (continuePath.topicsCompleted / continuePath.topicsTotal) *
-                          100
-                      )}%`,
-                    }}
-                  />
-                </div>
+              <div className="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-primary rounded-full"
+                  style={{
+                    width: `${
+                      continuePath.modulesTotal > 0
+                        ? Math.round(
+                            (continuePath.modulesCompleted /
+                              continuePath.modulesTotal) *
+                              100
+                          )
+                        : 0
+                    }%`,
+                  }}
+                />
               </div>
-              <button
-                onClick={() =>
-                  router.push(
-                    `/learn/${continuePath.repoOwner}-${continuePath.repoName}`
-                  )
-                }
-                className="px-6 py-3 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2"
-                data-testid="continue-btn"
-              >
-                Continue Learning
-                <span className="material-icons text-sm">arrow_forward</span>
-              </button>
             </div>
-          </div>
-        )}
-
-        {/* Your Learning Paths */}
-        <div data-testid="learning-paths">
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
-            Your Learning Paths
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {paths.map((path) => (
-              <LearningPathCard
-                key={path.fullName}
-                path={path}
-                onContinue={() =>
-                  router.push(`/learn/${path.repoOwner}-${path.repoName}`)
-                }
-              />
-            ))}
-            {/* Start New Path */}
             <button
-              onClick={() => router.push("/browse")}
-              className="flex flex-col items-center justify-center p-8 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 text-slate-400 hover:text-primary hover:border-primary transition-colors"
-              data-testid="new-path-btn"
+              onClick={() =>
+                router.push(
+                  `/learn/${continuePath.repoOwner}-${continuePath.repoName}`
+                )
+              }
+              className="px-6 py-3 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2"
+              data-testid="continue-btn"
             >
-              <span className="material-icons text-3xl mb-2">add</span>
-              <span className="text-sm font-medium">Start New Learning Path</span>
+              Continue Learning
+              <span className="material-icons text-sm">arrow_forward</span>
             </button>
           </div>
         </div>
-      </main>
-    </div>
+      )}
+
+      {/* Learning Paths */}
+      <div data-testid="learning-paths">
+        <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
+          Your Learning Paths
+        </h2>
+
+        {paths.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <>
+            <FilterTabs
+              active={filter}
+              onChange={setFilter}
+              counts={{
+                active: activePaths.length,
+                completed: completedPaths.length,
+                to_learn: toLearnPaths.length,
+              }}
+            />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredPaths.map((path) => (
+                <LearningPathCard
+                  key={`${path.repoOwner}/${path.repoName}/${path.level}`}
+                  path={path}
+                  onContinue={() =>
+                    router.push(
+                      `/learn/${path.repoOwner}-${path.repoName}`
+                    )
+                  }
+                />
+              ))}
+              {/* Start New Path */}
+              <button
+                onClick={() => router.push("/browse")}
+                className="flex flex-col items-center justify-center p-8 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 text-slate-400 hover:text-primary hover:border-primary transition-colors"
+                data-testid="new-path-btn"
+              >
+                <span className="material-icons text-3xl mb-2">add</span>
+                <span className="text-sm font-medium">
+                  Start New Learning Path
+                </span>
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </SidebarLayout>
   );
 }

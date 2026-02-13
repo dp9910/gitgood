@@ -5,7 +5,7 @@ import { useState } from "react";
 // ---------- Types ----------
 
 export interface OnboardingModalProps {
-  onComplete: () => void;
+  onComplete: (options?: { createRepo?: boolean }) => void;
   onSkip: () => void;
 }
 
@@ -31,6 +31,13 @@ const STEPS = [
       "Get AI explanations at your level, take quizzes to test your knowledge, and tackle coding challenges — all powered by your daily credits.",
     tip: "Use quick actions like 'Quiz me' and 'ELI5' for focused learning.",
   },
+  {
+    icon: "cloud_upload",
+    title: "Save your progress",
+    description:
+      "We can create a private GitHub repo called gitgood-learning to save your progress, notes, and achievements. This is optional — you can always set it up later.",
+    tip: "Your progress repo is private and only you can see it.",
+  },
 ] as const;
 
 // ---------- Component ----------
@@ -40,8 +47,22 @@ export default function OnboardingModal({
   onSkip,
 }: OnboardingModalProps) {
   const [step, setStep] = useState(0);
+  const [repoLoading, setRepoLoading] = useState(false);
   const current = STEPS[step];
   const isLast = step === STEPS.length - 1;
+
+  async function handleComplete(createRepo: boolean) {
+    if (isLast) {
+      setRepoLoading(true);
+      try {
+        onComplete({ createRepo });
+      } finally {
+        setRepoLoading(false);
+      }
+    } else {
+      setStep((s) => s + 1);
+    }
+  }
 
   return (
     <div
@@ -112,22 +133,37 @@ export default function OnboardingModal({
           >
             Back
           </button>
-          <button
-            onClick={() => {
-              if (isLast) {
-                onComplete();
-              } else {
-                setStep((s) => s + 1);
-              }
-            }}
-            className="px-6 py-2.5 bg-primary text-white font-bold text-sm rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2"
-            data-testid="next-btn"
-          >
-            {isLast ? "Get Started" : "Next"}
-            <span className="material-icons text-sm">
-              {isLast ? "rocket_launch" : "arrow_forward"}
-            </span>
-          </button>
+
+          {isLast ? (
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleComplete(false)}
+                disabled={repoLoading}
+                className="px-4 py-2.5 text-slate-500 font-medium text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                data-testid="skip-repo-btn"
+              >
+                Skip for now
+              </button>
+              <button
+                onClick={() => handleComplete(true)}
+                disabled={repoLoading}
+                className="px-6 py-2.5 bg-primary text-white font-bold text-sm rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2 disabled:opacity-50"
+                data-testid="create-repo-btn"
+              >
+                {repoLoading ? "Creating..." : "Create Repo"}
+                <span className="material-icons text-sm">cloud_upload</span>
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setStep((s) => s + 1)}
+              className="px-6 py-2.5 bg-primary text-white font-bold text-sm rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2"
+              data-testid="next-btn"
+            >
+              Next
+              <span className="material-icons text-sm">arrow_forward</span>
+            </button>
+          )}
         </div>
       </div>
     </div>

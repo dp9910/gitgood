@@ -56,11 +56,10 @@ describe("OnboardingModal", () => {
     expect(screen.getByText(STEPS[0].description)).toBeTruthy();
   });
 
-  it("shows progress dots", () => {
+  it("shows progress dots for 4 steps", () => {
     renderModal();
-    // 3 dots for 3 steps
     const dots = document.querySelectorAll(".rounded-full.w-2");
-    expect(dots.length).toBe(3);
+    expect(dots.length).toBe(4);
   });
 
   it("disables back button on first step", () => {
@@ -82,19 +81,38 @@ describe("OnboardingModal", () => {
     expect(screen.getByText(STEPS[0].title)).toBeTruthy();
   });
 
-  it("shows Get Started on last step", () => {
+  it("shows repo creation options on last step (step 4)", () => {
     renderModal();
-    fireEvent.click(screen.getByTestId("next-btn"));
-    fireEvent.click(screen.getByTestId("next-btn"));
-    expect(screen.getByTestId("next-btn").textContent).toContain("Get Started");
+    // Advance to step 4 (index 3)
+    fireEvent.click(screen.getByTestId("next-btn")); // step 2
+    fireEvent.click(screen.getByTestId("next-btn")); // step 3
+    fireEvent.click(screen.getByTestId("next-btn")); // step 4
+
+    expect(screen.getByText(STEPS[3].title)).toBeTruthy();
+    expect(screen.getByTestId("create-repo-btn")).toBeTruthy();
+    expect(screen.getByTestId("skip-repo-btn")).toBeTruthy();
   });
 
-  it("calls onComplete when Get Started clicked", () => {
+  it("calls onComplete with createRepo: true when Create Repo clicked", () => {
     renderModal();
+    // Navigate to last step
     fireEvent.click(screen.getByTestId("next-btn"));
     fireEvent.click(screen.getByTestId("next-btn"));
     fireEvent.click(screen.getByTestId("next-btn"));
-    expect(onComplete).toHaveBeenCalled();
+
+    fireEvent.click(screen.getByTestId("create-repo-btn"));
+    expect(onComplete).toHaveBeenCalledWith({ createRepo: true });
+  });
+
+  it("calls onComplete with createRepo: false when Skip for now clicked", () => {
+    renderModal();
+    // Navigate to last step
+    fireEvent.click(screen.getByTestId("next-btn"));
+    fireEvent.click(screen.getByTestId("next-btn"));
+    fireEvent.click(screen.getByTestId("next-btn"));
+
+    fireEvent.click(screen.getByTestId("skip-repo-btn"));
+    expect(onComplete).toHaveBeenCalledWith({ createRepo: false });
   });
 
   it("calls onSkip when Skip clicked", () => {
@@ -108,13 +126,43 @@ describe("OnboardingModal", () => {
     expect(screen.getByText(STEPS[0].tip)).toBeTruthy();
   });
 
-  it("navigates through all 3 steps", () => {
+  it("navigates through all 4 steps", () => {
     renderModal();
     expect(screen.getByText(STEPS[0].title)).toBeTruthy();
     fireEvent.click(screen.getByTestId("next-btn"));
     expect(screen.getByText(STEPS[1].title)).toBeTruthy();
     fireEvent.click(screen.getByTestId("next-btn"));
     expect(screen.getByText(STEPS[2].title)).toBeTruthy();
+    fireEvent.click(screen.getByTestId("next-btn"));
+    expect(screen.getByText(STEPS[3].title)).toBeTruthy();
+  });
+
+  it("step 4 has Save your progress title", () => {
+    renderModal();
+    fireEvent.click(screen.getByTestId("next-btn"));
+    fireEvent.click(screen.getByTestId("next-btn"));
+    fireEvent.click(screen.getByTestId("next-btn"));
+    expect(screen.getByText("Save your progress")).toBeTruthy();
+  });
+
+  it("step 4 mentions gitgood-learning repo", () => {
+    renderModal();
+    fireEvent.click(screen.getByTestId("next-btn"));
+    fireEvent.click(screen.getByTestId("next-btn"));
+    fireEvent.click(screen.getByTestId("next-btn"));
+    expect(screen.getByText(/gitgood-learning/)).toBeTruthy();
+  });
+
+  it("does not show Next button on last step", () => {
+    renderModal();
+    fireEvent.click(screen.getByTestId("next-btn"));
+    fireEvent.click(screen.getByTestId("next-btn"));
+    fireEvent.click(screen.getByTestId("next-btn"));
+    expect(screen.queryByTestId("next-btn")).toBeNull();
+  });
+
+  it("has 4 steps total", () => {
+    expect(STEPS.length).toBe(4);
   });
 });
 

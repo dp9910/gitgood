@@ -13,14 +13,21 @@ vi.mock("@/lib/firebase-client", () => ({
   signOut: vi.fn(),
 }));
 
+// Mock fetch for profile API
+const mockFetch = vi.fn();
+globalThis.fetch = mockFetch;
+
 import { AuthProvider, useAuth } from "@/lib/auth-context";
 
 function TestConsumer() {
-  const { user, loading } = useAuth();
+  const { user, loading, userProfile, profileLoading, isNewUser } = useAuth();
   return (
     <div>
       <span data-testid="loading">{String(loading)}</span>
-      <span data-testid="user">{user ? user.uid : "null"}</span>
+      <span data-testid="user">{user ? (user as { uid: string }).uid : "null"}</span>
+      <span data-testid="profile-loading">{String(profileLoading)}</span>
+      <span data-testid="is-new-user">{String(isNewUser)}</span>
+      <span data-testid="profile">{userProfile ? "loaded" : "null"}</span>
     </div>
   );
 }
@@ -28,6 +35,15 @@ function TestConsumer() {
 beforeEach(() => {
   vi.clearAllMocks();
   authCallback = null;
+  mockFetch.mockResolvedValue({
+    ok: true,
+    json: () => Promise.resolve({
+      uid: "user-789",
+      onboardingComplete: true,
+      learningPaths: [],
+      stats: { topicsCompleted: 0 },
+    }),
+  });
 });
 
 afterEach(() => {
@@ -76,6 +92,91 @@ describe("AuthProvider", () => {
 
     expect(screen.getByTestId("loading").textContent).toBe("false");
     expect(screen.getByTestId("user").textContent).toBe("null");
+  });
+
+  it("fetches profile when user signs in", async () => {
+    render(
+      <AuthProvider>
+        <TestConsumer />
+      </AuthProvider>
+    );
+
+    await act(async () => {
+      authCallback?.({ uid: "user-789", email: "test@test.com" });
+    });
+
+    expect(mockFetch).toHaveBeenCalledWith("/api/user/profile");
+  });
+
+  it("does not fetch profile when user signs out", async () => {
+    render(
+      <AuthProvider>
+        <TestConsumer />
+      </AuthProvider>
+    );
+
+    await act(async () => {
+      authCallback?.(null);
+    });
+
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
+
+  it("sets isNewUser when onboardingComplete is false", async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({
+        uid: "user-789",
+        onboardingComplete: false,
+        learningPaths: [],
+      }),
+    });
+
+    render(
+      <AuthProvider>
+        <TestConsumer />
+      </AuthProvider>
+    );
+
+    await act(async () => {
+      authCallback?.({ uid: "user-789" });
+    });
+
+    expect(screen.getByTestId("is-new-user").textContent).toBe("true");
+  });
+
+  it("sets isNewUser false when onboardingComplete is true", async () => {
+    render(
+      <AuthProvider>
+        <TestConsumer />
+      </AuthProvider>
+    );
+
+    await act(async () => {
+      authCallback?.({ uid: "user-789" });
+    });
+
+    expect(screen.getByTestId("is-new-user").textContent).toBe("false");
+  });
+
+  it("clears profile on logout", async () => {
+    render(
+      <AuthProvider>
+        <TestConsumer />
+      </AuthProvider>
+    );
+
+    // Sign in
+    await act(async () => {
+      authCallback?.({ uid: "user-789" });
+    });
+    expect(screen.getByTestId("profile").textContent).toBe("loaded");
+
+    // Sign out
+    await act(async () => {
+      authCallback?.(null);
+    });
+    expect(screen.getByTestId("profile").textContent).toBe("null");
   });
 });
 

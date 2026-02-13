@@ -3,6 +3,7 @@ import { requireAuth } from "@/lib/auth-middleware";
 import { getRedis } from "@/lib/redis";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { getUserOctokit, commitFile, fetchFileContent } from "@/lib/github";
+import { getUserGithubToken } from "@/lib/user-profile";
 import type { ProgressData } from "@/lib/progress";
 
 /**
@@ -64,10 +65,15 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Get user's GitHub token from session (stored in Firebase custom claims)
-  // For now, use the cache token as a fallback — in production this would
-  // come from the user's OAuth token stored in their Firebase profile.
-  const octokit = getUserOctokit(user.uid);
+  // Get user's stored GitHub token
+  const githubToken = await getUserGithubToken(user.uid);
+  if (!githubToken) {
+    return Response.json(
+      { error: "no_token", message: "GitHub token not found. Please re-authenticate." },
+      { status: 401, headers: rlHeaders }
+    );
+  }
+  const octokit = getUserOctokit(githubToken);
 
   const trackerRepo = "learning-tracker";
   const folder = `${repoOwner}-${repoName}`;

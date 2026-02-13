@@ -14,6 +14,7 @@ const validServerEnv = {
   FIREBASE_PRIVATE_KEY: "-----BEGIN PRIVATE KEY-----\ntest\n-----END PRIVATE KEY-----",
   KV_REST_API_URL: "https://test-kv.upstash.io",
   KV_REST_API_TOKEN: "test-kv-token",
+  ENCRYPTION_KEY: "a".repeat(64),
 };
 
 const validClientEnv = {
@@ -158,6 +159,7 @@ describe("security: server keys not in client schema", () => {
       "FIREBASE_CLIENT_EMAIL",
       "KV_REST_API_URL",
       "KV_REST_API_TOKEN",
+      "ENCRYPTION_KEY",
     ];
     for (const secret of serverSecrets) {
       expect(clientKeys).not.toContain(secret);
