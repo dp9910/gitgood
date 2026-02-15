@@ -32,7 +32,9 @@ const serverSchema = z.object({
   ENCRYPTION_KEY: z
     .string()
     .length(64, "ENCRYPTION_KEY must be a 64-character hex string (32 bytes)")
-    .regex(/^[0-9a-fA-F]+$/, "ENCRYPTION_KEY must be valid hex"),
+    .regex(/^[0-9a-fA-F]+$/, "ENCRYPTION_KEY must be valid hex")
+    .optional()
+    .default(""),
 });
 
 /**

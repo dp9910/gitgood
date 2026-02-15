@@ -5,6 +5,7 @@ import {
   saveMaterial,
   markLevelGenerated,
   incrementAccess,
+  listAvailableMaterials,
   COLLECTION,
   type MaterialRecord,
 } from "../lib/material-index";
@@ -15,6 +16,7 @@ const mockGet = vi.fn();
 const mockSet = vi.fn();
 const mockUpdate = vi.fn();
 const mockRunTransaction = vi.fn();
+const mockCollectionGet = vi.fn();
 
 const mockDoc = vi.fn().mockReturnValue({
   get: mockGet,
@@ -24,6 +26,7 @@ const mockDoc = vi.fn().mockReturnValue({
 
 const mockCollection = vi.fn().mockReturnValue({
   doc: mockDoc,
+  get: mockCollectionGet,
 });
 
 vi.mock("../lib/firebase-admin", () => ({
@@ -69,6 +72,7 @@ beforeEach(() => {
   });
   mockCollection.mockReturnValue({
     doc: mockDoc,
+    get: mockCollectionGet,
   });
 });
 
@@ -216,5 +220,130 @@ describe("incrementAccess", () => {
     await incrementAccess("nonexistent");
 
     expect(mockTxUpdate).not.toHaveBeenCalled();
+  });
+});
+
+describe("listAvailableMaterials", () => {
+  const learnableRecord: MaterialRecord = {
+    ...sampleRecord,
+    owner: "karpathy",
+    name: "micrograd",
+    timesAccessed: 20,
+    feasibility: { ...sampleRecord.feasibility, canLearn: true },
+    levels: {
+      beginner: { generated: true, generatedAt: "2026-01-01T00:00:00.000Z" },
+      intermediate: { generated: true, generatedAt: "2026-01-02T00:00:00.000Z" },
+      advanced: { generated: false, generatedAt: null },
+    },
+  };
+
+  const unlearnableRecord: MaterialRecord = {
+    ...sampleRecord,
+    owner: "test",
+    name: "unlearnable",
+    timesAccessed: 5,
+    feasibility: { ...sampleRecord.feasibility, canLearn: false },
+    levels: {
+      beginner: { generated: true, generatedAt: "2026-01-01T00:00:00.000Z" },
+      intermediate: { generated: false, generatedAt: null },
+      advanced: { generated: false, generatedAt: null },
+    },
+  };
+
+  const noGeneratedRecord: MaterialRecord = {
+    ...sampleRecord,
+    owner: "test",
+    name: "none-generated",
+    timesAccessed: 3,
+    feasibility: { ...sampleRecord.feasibility, canLearn: true },
+    levels: {
+      beginner: { generated: false, generatedAt: null },
+      intermediate: { generated: false, generatedAt: null },
+      advanced: { generated: false, generatedAt: null },
+    },
+  };
+
+  const lowAccessRecord: MaterialRecord = {
+    ...sampleRecord,
+    owner: "trekhleb",
+    name: "javascript-algorithms",
+    language: "javascript",
+    timesAccessed: 5,
+    feasibility: { ...sampleRecord.feasibility, canLearn: true },
+    levels: {
+      beginner: { generated: true, generatedAt: "2026-01-03T00:00:00.000Z" },
+      intermediate: { generated: false, generatedAt: null },
+      advanced: { generated: false, generatedAt: null },
+    },
+  };
+
+  it("returns materials with at least one generated level", async () => {
+    mockCollectionGet.mockResolvedValue({
+      docs: [{ data: () => learnableRecord }],
+    });
+
+    const results = await listAvailableMaterials();
+    expect(results).toHaveLength(1);
+    expect(results[0].owner).toBe("karpathy");
+    expect(results[0].name).toBe("micrograd");
+  });
+
+  it("includes correct level availability", async () => {
+    mockCollectionGet.mockResolvedValue({
+      docs: [{ data: () => learnableRecord }],
+    });
+
+    const results = await listAvailableMaterials();
+    expect(results[0].levels).toEqual({
+      beginner: true,
+      intermediate: true,
+      advanced: false,
+    });
+  });
+
+  it("excludes materials where canLearn is false", async () => {
+    mockCollectionGet.mockResolvedValue({
+      docs: [
+        { data: () => learnableRecord },
+        { data: () => unlearnableRecord },
+      ],
+    });
+
+    const results = await listAvailableMaterials();
+    expect(results).toHaveLength(1);
+    expect(results[0].owner).toBe("karpathy");
+  });
+
+  it("excludes materials with no generated levels", async () => {
+    mockCollectionGet.mockResolvedValue({
+      docs: [
+        { data: () => learnableRecord },
+        { data: () => noGeneratedRecord },
+      ],
+    });
+
+    const results = await listAvailableMaterials();
+    expect(results).toHaveLength(1);
+  });
+
+  it("sorts by timesAccessed descending", async () => {
+    mockCollectionGet.mockResolvedValue({
+      docs: [
+        { data: () => lowAccessRecord },
+        { data: () => learnableRecord },
+      ],
+    });
+
+    const results = await listAvailableMaterials();
+    expect(results).toHaveLength(2);
+    expect(results[0].timesAccessed).toBe(20);
+    expect(results[1].timesAccessed).toBe(5);
+  });
+
+  it("returns empty array for empty collection", async () => {
+    mockCollectionGet.mockResolvedValue({ docs: [] });
+
+    const results = await listAvailableMaterials();
+    expect(results).toEqual([]);
   });
 });

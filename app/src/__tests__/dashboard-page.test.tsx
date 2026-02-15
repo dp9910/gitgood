@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 
 const mockPush = vi.fn();
 
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: mockPush }),
+  useRouter: () => ({ push: mockPush, replace: mockPush }),
   usePathname: () => "/dashboard",
 }));
 
@@ -13,6 +13,17 @@ const mockUseAuth = vi.fn();
 
 vi.mock("@/lib/auth-context", () => ({
   useAuth: (...args: unknown[]) => mockUseAuth(...args),
+}));
+
+// Mock github.ts to avoid octokit import issues
+vi.mock("@/lib/github", () => ({
+  parseRepoUrl: (url: string) => {
+    const m = url.match(/^([a-zA-Z0-9_.-]+)\/([a-zA-Z0-9_.-]+)$/);
+    if (m) return { owner: m[1], repo: m[2] };
+    const u = url.match(/github\.com\/([^/]+)\/([^/]+)/);
+    if (u) return { owner: u[1], repo: u[2] };
+    return null;
+  },
 }));
 
 import DashboardPage from "../app/dashboard/page";
@@ -74,12 +85,16 @@ const defaultAuthState = {
 beforeEach(() => {
   vi.clearAllMocks();
   mockUseAuth.mockReturnValue(defaultAuthState);
+  // Default: empty materials
+  global.fetch = vi.fn().mockResolvedValue({
+    json: () => Promise.resolve({ materials: [] }),
+  });
 });
 
-describe("DashboardPage", () => {
-  it("shows stats row with 3 cards", () => {
+describe("DashboardPage — returning user", () => {
+  it("shows stats strip", () => {
     render(<DashboardPage />);
-    expect(screen.getByTestId("stats-row")).toBeTruthy();
+    expect(screen.getByTestId("stats-strip")).toBeTruthy();
     expect(screen.getByText("Topics Completed")).toBeTruthy();
     expect(screen.getByText("Learning Streak")).toBeTruthy();
     expect(screen.getByText("Time Invested")).toBeTruthy();
@@ -92,48 +107,15 @@ describe("DashboardPage", () => {
     expect(screen.getByTestId("stat-time-invested").textContent).toBe("18.5h");
   });
 
-  it("shows heatmap", () => {
+  it("shows continue hero for active paths", () => {
     render(<DashboardPage />);
-    expect(screen.getByTestId("heatmap")).toBeTruthy();
-    expect(screen.getByText("Learning Activity")).toBeTruthy();
-  });
-
-  it("shows continue learning section for active paths", () => {
-    render(<DashboardPage />);
-    expect(screen.getByTestId("continue-section")).toBeTruthy();
-    expect(screen.getByText("Pick up where you left off")).toBeTruthy();
+    expect(screen.getByTestId("continue-hero")).toBeTruthy();
+    expect(screen.getAllByText("Continue Learning").length).toBeGreaterThan(0);
   });
 
   it("shows continue button", () => {
     render(<DashboardPage />);
     expect(screen.getByTestId("continue-btn")).toBeTruthy();
-    expect(screen.getByText("Continue Learning")).toBeTruthy();
-  });
-
-  it("shows learning paths section", () => {
-    render(<DashboardPage />);
-    expect(screen.getByTestId("learning-paths")).toBeTruthy();
-    expect(screen.getByText("Your Learning Paths")).toBeTruthy();
-  });
-
-  it("shows filter tabs", () => {
-    render(<DashboardPage />);
-    expect(screen.getByTestId("filter-tabs")).toBeTruthy();
-    expect(screen.getByTestId("tab-active")).toBeTruthy();
-    expect(screen.getByTestId("tab-completed")).toBeTruthy();
-    expect(screen.getByTestId("tab-to_learn")).toBeTruthy();
-  });
-
-  it("shows start new path button", () => {
-    render(<DashboardPage />);
-    expect(screen.getByTestId("new-path-btn")).toBeTruthy();
-    expect(screen.getByText("Start New Learning Path")).toBeTruthy();
-  });
-
-  it("shows heatmap legend", () => {
-    render(<DashboardPage />);
-    expect(screen.getByText("Less")).toBeTruthy();
-    expect(screen.getByText("More")).toBeTruthy();
   });
 
   it("navigates on continue button click", () => {
@@ -142,50 +124,122 @@ describe("DashboardPage", () => {
     expect(mockPush).toHaveBeenCalledWith("/learn/karpathy-micrograd");
   });
 
-  it("navigates on new path button click", () => {
+  it("shows quick action cards", () => {
     render(<DashboardPage />);
-    fireEvent.click(screen.getByTestId("new-path-btn"));
+    expect(screen.getByTestId("quick-actions")).toBeTruthy();
+    expect(screen.getByTestId("action-browse")).toBeTruthy();
+    expect(screen.getByTestId("action-learn")).toBeTruthy();
+  });
+
+  it("navigates to browse from quick action", () => {
+    render(<DashboardPage />);
+    fireEvent.click(screen.getByTestId("action-browse"));
     expect(mockPush).toHaveBeenCalledWith("/browse");
   });
 
-  it("switches filter tabs", () => {
+  it("navigates to learn from quick action", () => {
     render(<DashboardPage />);
-    // Default is "active" tab - should show micrograd
-    expect(screen.getAllByText("karpathy/micrograd").length).toBeGreaterThanOrEqual(1);
-
-    // Switch to "completed" tab
-    fireEvent.click(screen.getByTestId("tab-completed"));
-    expect(screen.getByText("trekhleb/javascript-algorithms")).toBeTruthy();
+    fireEvent.click(screen.getByTestId("action-learn"));
+    expect(mockPush).toHaveBeenCalledWith("/learn");
   });
 });
 
-describe("DashboardPage — empty state", () => {
-  it("shows empty state when no learning paths", () => {
+describe("DashboardPage — new user (no paths)", () => {
+  beforeEach(() => {
     mockUseAuth.mockReturnValue({
       ...defaultAuthState,
       userProfile: {
         ...defaultAuthState.userProfile,
         learningPaths: [],
+        stats: {
+          topicsCompleted: 0,
+          hoursInvested: 0,
+          currentStreak: 0,
+          longestStreak: 0,
+          lastActiveAt: null,
+        },
       },
     });
-
-    render(<DashboardPage />);
-    expect(screen.getByTestId("empty-state")).toBeTruthy();
-    expect(screen.getByText("Start your learning journey")).toBeTruthy();
-    expect(screen.getByTestId("browse-btn")).toBeTruthy();
   });
 
-  it("does not show continue section when no active paths", () => {
-    mockUseAuth.mockReturnValue({
-      ...defaultAuthState,
-      userProfile: {
-        ...defaultAuthState.userProfile,
-        learningPaths: [],
-      },
+  it("shows welcome hero", () => {
+    render(<DashboardPage />);
+    expect(screen.getByTestId("welcome-hero")).toBeTruthy();
+    expect(screen.getByText("Ready to start learning?")).toBeTruthy();
+  });
+
+  it("shows suggested courses", () => {
+    render(<DashboardPage />);
+    expect(screen.getByTestId("suggested-courses")).toBeTruthy();
+  });
+
+  it("shows quick start input", () => {
+    render(<DashboardPage />);
+    expect(screen.getByTestId("quick-start")).toBeTruthy();
+    expect(screen.getByTestId("quick-start-input")).toBeTruthy();
+  });
+
+  it("does not show continue hero", () => {
+    render(<DashboardPage />);
+    expect(screen.queryByTestId("continue-hero")).toBeNull();
+  });
+
+  it("does not show stats strip", () => {
+    render(<DashboardPage />);
+    expect(screen.queryByTestId("stats-strip")).toBeNull();
+  });
+
+  it("navigates on valid URL submit", () => {
+    render(<DashboardPage />);
+    const input = screen.getByTestId("quick-start-input");
+    fireEvent.change(input, { target: { value: "karpathy/nanoGPT" } });
+    fireEvent.submit(input.closest("form")!);
+    expect(mockPush).toHaveBeenCalledWith("/course/karpathy-nanoGPT");
+  });
+
+  it("shows URL error on invalid URL", () => {
+    render(<DashboardPage />);
+    const input = screen.getByTestId("quick-start-input");
+    fireEvent.change(input, { target: { value: "not-a-valid-url" } });
+    fireEvent.submit(input.closest("form")!);
+    expect(screen.getByTestId("url-error")).toBeTruthy();
+  });
+
+  it("shows ready courses when available", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+      json: () =>
+        Promise.resolve({
+          materials: [
+            {
+              owner: "testowner",
+              name: "testrepo",
+              language: "Python",
+              description: "Test repo",
+              levels: { beginner: true, intermediate: false, advanced: false },
+              estimatedHours: { beginner: 8, intermediate: 5, advanced: 3 },
+              timesAccessed: 10,
+            },
+          ],
+        }),
     });
 
     render(<DashboardPage />);
-    expect(screen.queryByTestId("continue-section")).toBeNull();
+
+    await waitFor(() => {
+      expect(screen.getByText("Ready to Learn")).toBeTruthy();
+    });
+    expect(screen.getAllByTestId("ready-badge").length).toBeGreaterThan(0);
+  });
+
+  it("falls back to curated repos when no ready courses", async () => {
+    render(<DashboardPage />);
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalled();
+    });
+
+    // Should show "Suggested Courses" heading (fallback)
+    expect(screen.getByText("Suggested Courses")).toBeTruthy();
   });
 });
 
@@ -198,29 +252,5 @@ describe("DashboardPage — loading state", () => {
 
     render(<DashboardPage />);
     expect(screen.getByTestId("loading")).toBeTruthy();
-  });
-});
-
-describe("DashboardPage — zero stats", () => {
-  it("shows zero values for new user", () => {
-    mockUseAuth.mockReturnValue({
-      ...defaultAuthState,
-      userProfile: {
-        ...defaultAuthState.userProfile,
-        stats: {
-          topicsCompleted: 0,
-          hoursInvested: 0,
-          currentStreak: 0,
-          longestStreak: 0,
-          lastActiveAt: null,
-        },
-        learningPaths: [],
-      },
-    });
-
-    render(<DashboardPage />);
-    expect(screen.getByTestId("stat-topics-completed").textContent).toBe("0");
-    expect(screen.getByTestId("stat-learning-streak").textContent).toBe("0 days");
-    expect(screen.getByTestId("stat-time-invested").textContent).toBe("0h");
   });
 });

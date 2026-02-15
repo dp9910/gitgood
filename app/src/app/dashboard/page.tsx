@@ -1,122 +1,46 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import SidebarLayout from "@/components/sidebar-layout";
 import OnboardingModal from "@/components/onboarding-modal";
-import {
-  type HeatmapDay,
-  generateHeatmapData,
-  getHeatmapColor,
-} from "@/lib/dashboard";
+import { CURATED_REPOS } from "@/lib/curated-repos";
+import { parseRepoUrl } from "@/lib/github";
 import type { LearningPathEntry } from "@/lib/user-profile";
 
-// ---------- Sub-components ----------
+// ---------- Shared sub-components ----------
 
 function StatCard({
   icon,
   label,
   value,
-  subtitle,
 }: {
   icon: string;
   label: string;
   value: string;
-  subtitle?: string;
 }) {
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 hover:shadow-md transition-shadow">
-      <div className="flex items-center gap-3 mb-3">
-        <span className="material-icons text-primary">{icon}</span>
-        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+    <div className="flex items-center gap-3 px-4 py-3">
+      <span className="material-icons text-primary text-lg">{icon}</span>
+      <div>
+        <p
+          className="text-lg font-extrabold text-slate-900 dark:text-white leading-tight"
+          data-testid={`stat-${label.toLowerCase().replace(/\s/g, "-")}`}
+        >
+          {value}
+        </p>
+        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
           {label}
         </span>
       </div>
-      <p
-        className="text-3xl font-extrabold text-slate-900 dark:text-white"
-        data-testid={`stat-${label.toLowerCase().replace(/\s/g, "-")}`}
-      >
-        {value}
-      </p>
-      {subtitle && (
-        <p className="text-xs text-green-600 dark:text-green-400 mt-1 font-medium">
-          {subtitle}
-        </p>
-      )}
     </div>
   );
 }
 
-function Heatmap({ data }: { data: HeatmapDay[] }) {
-  return (
-    <div
-      className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6"
-      data-testid="heatmap"
-    >
-      <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-4">
-        Learning Activity
-      </h3>
-      <div className="flex flex-wrap gap-1">
-        {data.map((day) => (
-          <div
-            key={day.date}
-            className={`w-3 h-3 rounded-sm ${getHeatmapColor(day.count)}`}
-            title={`${day.date}: ${day.count} topics`}
-          />
-        ))}
-      </div>
-      <div className="flex items-center gap-2 mt-3 text-[10px] text-slate-400">
-        <span>Less</span>
-        <div className="w-3 h-3 rounded-sm bg-slate-100 dark:bg-slate-800" />
-        <div className="w-3 h-3 rounded-sm bg-green-200 dark:bg-green-900" />
-        <div className="w-3 h-3 rounded-sm bg-green-400 dark:bg-green-700" />
-        <div className="w-3 h-3 rounded-sm bg-green-600 dark:bg-green-500" />
-        <span>More</span>
-      </div>
-    </div>
-  );
-}
+// ---------- Returning-user sub-components ----------
 
-function ProgressRing({
-  progress,
-  size = 56,
-  strokeWidth = 5,
-}: {
-  progress: number;
-  size?: number;
-  strokeWidth?: number;
-}) {
-  const radius = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (progress / 100) * circumference;
-
-  return (
-    <svg width={size} height={size} className="transform -rotate-90">
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={radius}
-        strokeWidth={strokeWidth}
-        fill="none"
-        className="stroke-slate-200 dark:stroke-slate-700"
-      />
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={radius}
-        strokeWidth={strokeWidth}
-        fill="none"
-        strokeDasharray={circumference}
-        strokeDashoffset={offset}
-        strokeLinecap="round"
-        className="stroke-primary transition-all"
-      />
-    </svg>
-  );
-}
-
-function LearningPathCard({
+function ContinueHeroCard({
   path,
   onContinue,
 }: {
@@ -129,100 +53,271 @@ function LearningPathCard({
       : 0;
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 hover:shadow-md transition-shadow group">
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex-1 min-w-0">
-          <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors truncate">
-            {path.repoOwner}/{path.repoName}
-          </h3>
-          <p className="text-xs text-slate-400 mt-0.5">
-            {path.lastModuleTitle ? `Last: ${path.lastModuleTitle}` : path.level}
-          </p>
-        </div>
-        <ProgressRing progress={progress} />
-      </div>
-
-      <div className="flex items-center justify-between mb-3">
+    <div
+      className="bg-gradient-to-r from-primary/5 to-transparent rounded-xl border border-slate-200 dark:border-slate-800 p-8 mb-6"
+      data-testid="continue-hero"
+    >
+      <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">
+        Continue Learning
+      </h2>
+      <div className="flex items-center justify-between mb-1">
+        <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+          {path.repoOwner}/{path.repoName}
+        </h3>
         <span className="text-[10px] px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-slate-500 font-mono">
           {path.language}
         </span>
-        <span className="text-xs text-slate-400 font-medium">
-          {path.modulesCompleted}/{path.modulesTotal} modules
-        </span>
       </div>
-
+      {path.lastModuleTitle && (
+        <p className="text-sm text-slate-500 mb-4">
+          Last: {path.lastModuleTitle}
+        </p>
+      )}
+      <div className="mb-4">
+        <div className="flex items-center justify-between text-sm text-slate-400 mb-1.5">
+          <span>
+            {path.modulesCompleted} of {path.modulesTotal} modules
+          </span>
+          <span className="font-medium">{progress}%</span>
+        </div>
+        <div className="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-primary rounded-full"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      </div>
       <button
         onClick={onContinue}
-        className="w-full px-4 py-2 bg-primary/5 text-primary font-bold text-sm rounded-lg hover:bg-primary/10 transition-colors flex items-center justify-center gap-2"
+        className="px-6 py-3 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2"
+        data-testid="continue-btn"
       >
-        {path.status === "to_learn" ? "Start" : "Continue"}
+        Continue Learning
         <span className="material-icons text-sm">arrow_forward</span>
       </button>
     </div>
   );
 }
 
-function EmptyState() {
-  const router = useRouter();
+function StatsStrip({ stats }: { stats: { topicsCompleted: number; currentStreak: number; hoursInvested: number } }) {
   return (
-    <div className="text-center py-16" data-testid="empty-state">
-      <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
-        <span className="material-icons text-4xl text-primary">school</span>
-      </div>
-      <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
-        Start your learning journey
-      </h3>
-      <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 max-w-sm mx-auto">
-        Browse repositories to find something to learn, and we&apos;ll create a
-        personalized curriculum for you.
-      </p>
-      <button
-        onClick={() => router.push("/browse")}
-        className="px-6 py-3 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-colors inline-flex items-center gap-2"
-        data-testid="browse-btn"
-      >
-        Browse Repositories
-        <span className="material-icons text-sm">arrow_forward</span>
-      </button>
+    <div
+      className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-wrap divide-x divide-slate-200 dark:divide-slate-800 mb-6"
+      data-testid="stats-strip"
+    >
+      <StatCard
+        icon="check_circle"
+        label="Topics Completed"
+        value={stats.topicsCompleted.toString()}
+      />
+      <StatCard
+        icon="local_fire_department"
+        label="Learning Streak"
+        value={`${stats.currentStreak} days`}
+      />
+      <StatCard
+        icon="timer"
+        label="Time Invested"
+        value={`${stats.hoursInvested}h`}
+      />
     </div>
   );
 }
 
-// ---------- Filter Tabs ----------
-
-type PathFilter = "active" | "completed" | "to_learn";
-
-function FilterTabs({
-  active,
-  onChange,
-  counts,
+function QuickActionCard({
+  icon,
+  title,
+  subtitle,
+  onClick,
+  testId,
 }: {
-  active: PathFilter;
-  onChange: (f: PathFilter) => void;
-  counts: Record<PathFilter, number>;
+  icon: string;
+  title: string;
+  subtitle: string;
+  onClick: () => void;
+  testId?: string;
 }) {
-  const tabs: { key: PathFilter; label: string }[] = [
-    { key: "active", label: "Active" },
-    { key: "completed", label: "Completed" },
-    { key: "to_learn", label: "To Learn" },
-  ];
+  return (
+    <button
+      onClick={onClick}
+      className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 text-left hover:shadow-md hover:-translate-y-0.5 transition-all group"
+      data-testid={testId}
+    >
+      <span className="material-icons text-primary text-2xl mb-3 block">
+        {icon}
+      </span>
+      <h3 className="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-primary transition-colors">
+        {title}
+      </h3>
+      <p className="text-xs text-slate-400">{subtitle}</p>
+    </button>
+  );
+}
+
+// ---------- New-user sub-components ----------
+
+function WelcomeHero() {
+  return (
+    <div
+      className="bg-gradient-to-r from-primary/5 to-transparent rounded-xl border border-slate-200 dark:border-slate-800 p-8 mb-6 text-center"
+      data-testid="welcome-hero"
+    >
+      <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">
+        Ready to start learning?
+      </h1>
+      <p className="text-slate-500 dark:text-slate-400">
+        Pick a course or paste any GitHub URL
+      </p>
+    </div>
+  );
+}
+
+interface ReadyMaterial {
+  owner: string;
+  name: string;
+  language: string;
+  description: string;
+  levels: { beginner: boolean; intermediate: boolean; advanced: boolean };
+}
+
+function SuggestedCourses() {
+  const router = useRouter();
+  const [readyCourses, setReadyCourses] = useState<ReadyMaterial[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/materials")
+      .then((res) => res.json())
+      .then((data) => setReadyCourses((data.materials ?? []).slice(0, 3)))
+      .catch(() => {})
+      .finally(() => setLoaded(true));
+  }, []);
+
+  // Fall back to curated beginner repos if no ready courses
+  const beginnerRepos = CURATED_REPOS.filter(
+    (r) => r.difficulty === "beginner"
+  ).slice(0, 3);
+
+  const hasReady = loaded && readyCourses.length > 0;
+  const courses = hasReady
+    ? readyCourses.map((c) => ({
+        key: `${c.owner}/${c.name}`,
+        name: `${c.owner}/${c.name}`,
+        language: c.language,
+        ready: true,
+        onClick: () => router.push(`/course/${c.owner}-${c.name}`),
+      }))
+    : beginnerRepos.map((r) => ({
+        key: r.fullName,
+        name: r.fullName,
+        language: r.language,
+        ready: false,
+        onClick: () => router.push(`/course/${r.owner}-${r.name}`),
+      }));
 
   return (
-    <div className="flex gap-1 mb-4" data-testid="filter-tabs">
-      {tabs.map((tab) => (
+    <div className="mb-6" data-testid="suggested-courses">
+      <div className="flex items-center gap-2 mb-3">
+        <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider">
+          {hasReady ? "Ready to Learn" : "Suggested Courses"}
+        </h2>
+        {hasReady && (
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+            Instant access
+          </span>
+        )}
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {courses.map((course) => (
+          <button
+            key={course.key}
+            onClick={course.onClick}
+            className={`bg-white dark:bg-slate-900 rounded-xl border p-5 text-left hover:shadow-md transition-shadow group relative ${
+              course.ready
+                ? "border-green-200 dark:border-green-900/50"
+                : "border-slate-200 dark:border-slate-800"
+            }`}
+          >
+            {course.ready && (
+              <span
+                className="absolute top-3 right-3 text-[10px] font-bold px-2 py-0.5 rounded bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 flex items-center gap-1"
+                data-testid="ready-badge"
+              >
+                <span className="material-icons text-[10px]">check_circle</span>
+                Ready
+              </span>
+            )}
+            <h3 className="font-bold text-slate-900 dark:text-white mb-1 group-hover:text-primary transition-colors truncate pr-14">
+              {course.name}
+            </h3>
+            <div className="flex items-center gap-2 mt-2">
+              <span className="text-[10px] px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-slate-500 font-mono">
+                {course.language}
+              </span>
+              {!course.ready && (
+                <span className="text-[10px] px-2 py-0.5 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded font-bold">
+                  Beginner
+                </span>
+              )}
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function QuickStartInput() {
+  const router = useRouter();
+  const [repoUrl, setRepoUrl] = useState("");
+  const [urlError, setUrlError] = useState("");
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!repoUrl.trim()) return;
+    const parsed = parseRepoUrl(repoUrl.trim());
+    if (!parsed) {
+      setUrlError("Invalid GitHub URL. Try owner/repo or a full URL.");
+      return;
+    }
+    setUrlError("");
+    router.push(`/course/${parsed.owner}-${parsed.repo}`);
+  }
+
+  return (
+    <div
+      className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6"
+      data-testid="quick-start"
+    >
+      <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">
+        Quick Start
+      </h2>
+      <form onSubmit={handleSubmit} className="flex gap-3">
+        <input
+          type="text"
+          value={repoUrl}
+          onChange={(e) => {
+            setRepoUrl(e.target.value);
+            setUrlError("");
+          }}
+          placeholder="Paste any GitHub URL..."
+          className="flex-1 px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+          data-testid="quick-start-input"
+        />
         <button
-          key={tab.key}
-          onClick={() => onChange(tab.key)}
-          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-            active === tab.key
-              ? "bg-primary/10 text-primary"
-              : "text-slate-400 hover:text-slate-600"
-          }`}
-          data-testid={`tab-${tab.key}`}
+          type="submit"
+          className="px-6 py-3 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2 whitespace-nowrap"
+          data-testid="quick-start-btn"
         >
-          {tab.label} ({counts[tab.key]})
+          Start Learning
+          <span className="material-icons text-sm">arrow_forward</span>
         </button>
-      ))}
+      </form>
+      {urlError && (
+        <p className="text-xs text-red-500 mt-2" data-testid="url-error">
+          {urlError}
+        </p>
+      )}
     </div>
   );
 }
@@ -232,23 +327,13 @@ function FilterTabs({
 export default function DashboardPage() {
   const router = useRouter();
   const { user, loading, userProfile, profileLoading, isNewUser, refreshProfile } = useAuth();
-  const [filter, setFilter] = useState<PathFilter>("active");
   const [showOnboarding, setShowOnboarding] = useState(true);
 
   const stats = userProfile?.stats;
   const paths = userProfile?.learningPaths ?? [];
 
-  // Filter learning paths
   const activePaths = paths.filter((p) => p.status === "active");
-  const completedPaths = paths.filter((p) => p.status === "completed");
   const toLearnPaths = paths.filter((p) => p.status === "to_learn");
-
-  const filteredPaths =
-    filter === "active"
-      ? activePaths
-      : filter === "completed"
-      ? completedPaths
-      : toLearnPaths;
 
   // Find most recently active path for "Continue Learning"
   const continuePath =
@@ -260,11 +345,7 @@ export default function DashboardPage() {
         )[0]
       : null;
 
-  // Heatmap from lastActiveAt (simplified — in production, track per-day activity)
-  const heatmapData = generateHeatmapData(
-    stats?.lastActiveAt ? [stats.lastActiveAt] : [],
-    12
-  );
+  const hasLearningPaths = paths.length > 0;
 
   // Redirect unauthenticated users to login
   if (!loading && !user) {
@@ -309,151 +390,66 @@ export default function DashboardPage() {
           onSkip={handleOnboardingSkip}
         />
       )}
-      {/* Stats Row */}
-      <div
-        className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"
-        data-testid="stats-row"
-      >
-        <StatCard
-          icon="check_circle"
-          label="Topics Completed"
-          value={(stats?.topicsCompleted ?? 0).toString()}
-        />
-        <StatCard
-          icon="local_fire_department"
-          label="Learning Streak"
-          value={`${stats?.currentStreak ?? 0} days`}
-        />
-        <StatCard
-          icon="timer"
-          label="Time Invested"
-          value={`${stats?.hoursInvested ?? 0}h`}
-        />
-      </div>
 
-      {/* Heatmap */}
-      <div className="mb-8">
-        <Heatmap data={heatmapData} />
-      </div>
-
-      {/* Continue Learning Hero */}
-      {continuePath && (
-        <div className="mb-8" data-testid="continue-section">
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
-            Pick up where you left off
-          </h2>
-          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-8">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-                  {continuePath.repoOwner}/{continuePath.repoName}
-                </h3>
-                <p className="text-sm text-slate-500 mt-1">
-                  {continuePath.lastModuleTitle
-                    ? `Last: ${continuePath.lastModuleTitle}`
-                    : continuePath.level}
-                </p>
-              </div>
-              <span className="text-xs px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-slate-500 font-mono">
-                {continuePath.language}
-              </span>
-            </div>
-            <div className="mb-4">
-              <div className="flex items-center justify-between text-sm text-slate-400 mb-1.5">
-                <span>
-                  {continuePath.modulesCompleted} of{" "}
-                  {continuePath.modulesTotal} modules
-                </span>
-                <span className="font-medium">
-                  {continuePath.modulesTotal > 0
-                    ? Math.round(
-                        (continuePath.modulesCompleted /
-                          continuePath.modulesTotal) *
-                          100
-                      )
-                    : 0}
-                  %
-                </span>
-              </div>
-              <div className="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-primary rounded-full"
-                  style={{
-                    width: `${
-                      continuePath.modulesTotal > 0
-                        ? Math.round(
-                            (continuePath.modulesCompleted /
-                              continuePath.modulesTotal) *
-                              100
-                          )
-                        : 0
-                    }%`,
-                  }}
-                />
-              </div>
-            </div>
-            <button
-              onClick={() =>
+      {hasLearningPaths ? (
+        /* ===== Returning User Layout ===== */
+        <>
+          {/* Continue Learning Hero */}
+          {continuePath && (
+            <ContinueHeroCard
+              path={continuePath}
+              onContinue={() =>
                 router.push(
                   `/learn/${continuePath.repoOwner}-${continuePath.repoName}`
                 )
               }
-              className="px-6 py-3 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2"
-              data-testid="continue-btn"
-            >
-              Continue Learning
-              <span className="material-icons text-sm">arrow_forward</span>
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Learning Paths */}
-      <div data-testid="learning-paths">
-        <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
-          Your Learning Paths
-        </h2>
-
-        {paths.length === 0 ? (
-          <EmptyState />
-        ) : (
-          <>
-            <FilterTabs
-              active={filter}
-              onChange={setFilter}
-              counts={{
-                active: activePaths.length,
-                completed: completedPaths.length,
-                to_learn: toLearnPaths.length,
-              }}
             />
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredPaths.map((path) => (
-                <LearningPathCard
-                  key={`${path.repoOwner}/${path.repoName}/${path.level}`}
-                  path={path}
-                  onContinue={() =>
-                    router.push(
-                      `/learn/${path.repoOwner}-${path.repoName}`
-                    )
-                  }
-                />
-              ))}
-              {/* Start New Path */}
-              <button
-                onClick={() => router.push("/browse")}
-                className="flex flex-col items-center justify-center p-8 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 text-slate-400 hover:text-primary hover:border-primary transition-colors"
-                data-testid="new-path-btn"
-              >
-                <span className="material-icons text-3xl mb-2">add</span>
-                <span className="text-sm font-medium">
-                  Start New Learning Path
-                </span>
-              </button>
-            </div>
-          </>
-        )}
-      </div>
+          )}
+
+          {/* Stats Strip */}
+          <StatsStrip
+            stats={{
+              topicsCompleted: stats?.topicsCompleted ?? 0,
+              currentStreak: stats?.currentStreak ?? 0,
+              hoursInvested: stats?.hoursInvested ?? 0,
+            }}
+          />
+
+          {/* Quick Action Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4" data-testid="quick-actions">
+            <QuickActionCard
+              icon="explore"
+              title="Browse Courses"
+              subtitle="Discover new repos to learn from"
+              onClick={() => router.push("/browse")}
+              testId="action-browse"
+            />
+            <QuickActionCard
+              icon="menu_book"
+              title="My Learning"
+              subtitle="Manage your learning paths"
+              onClick={() => router.push("/learn")}
+              testId="action-learn"
+            />
+            {toLearnPaths.length > 0 && (
+              <QuickActionCard
+                icon="queue"
+                title={`${toLearnPaths.length} queued`}
+                subtitle="Paths waiting to start"
+                onClick={() => router.push("/learn")}
+                testId="action-queued"
+              />
+            )}
+          </div>
+        </>
+      ) : (
+        /* ===== New User Layout ===== */
+        <>
+          <WelcomeHero />
+          <SuggestedCourses />
+          <QuickStartInput />
+        </>
+      )}
     </SidebarLayout>
   );
 }

@@ -112,4 +112,56 @@ export async function incrementAccess(docId: string): Promise<void> {
   });
 }
 
+// ---------- Listing ----------
+
+export interface AvailableMaterial {
+  owner: string;
+  name: string;
+  language: string;
+  description: string;
+  levels: {
+    beginner: boolean;
+    intermediate: boolean;
+    advanced: boolean;
+  };
+  estimatedHours: { beginner: number; intermediate: number; advanced: number };
+  timesAccessed: number;
+}
+
+/**
+ * List all materials that have at least one generated level and are learnable.
+ * Returns lightweight metadata sorted by popularity (most accessed first).
+ */
+export async function listAvailableMaterials(): Promise<AvailableMaterial[]> {
+  const db = getAdminFirestore();
+  const snapshot = await db.collection(COLLECTION).get();
+  const results: AvailableMaterial[] = [];
+
+  for (const doc of snapshot.docs) {
+    const data = doc.data() as MaterialRecord;
+    const hasGenerated =
+      data.levels.beginner.generated ||
+      data.levels.intermediate.generated ||
+      data.levels.advanced.generated;
+
+    if (!data.feasibility?.canLearn || !hasGenerated) continue;
+
+    results.push({
+      owner: data.owner,
+      name: data.name,
+      language: data.language,
+      description: data.description,
+      levels: {
+        beginner: data.levels.beginner.generated,
+        intermediate: data.levels.intermediate.generated,
+        advanced: data.levels.advanced.generated,
+      },
+      estimatedHours: data.feasibility.estimatedHours,
+      timesAccessed: data.timesAccessed,
+    });
+  }
+
+  return results.sort((a, b) => b.timesAccessed - a.timesAccessed);
+}
+
 export { COLLECTION };

@@ -40,8 +40,8 @@ describe("filterRepos", () => {
   });
 
   it("filters by category", () => {
-    const result = filterRepos(CURATED_REPOS, "", "Machine Learning");
-    expect(result.every((r) => r.category === "Machine Learning")).toBe(true);
+    const result = filterRepos(CURATED_REPOS, "", "GPT");
+    expect(result.every((r) => r.category === "GPT")).toBe(true);
     expect(result.length).toBeGreaterThan(0);
   });
 
@@ -52,8 +52,9 @@ describe("filterRepos", () => {
   });
 
   it("filters by search query (language)", () => {
-    const result = filterRepos(CURATED_REPOS, "TypeScript", "All");
-    expect(result.every((r) => r.language === "TypeScript")).toBe(true);
+    const result = filterRepos(CURATED_REPOS, "Python", "All");
+    expect(result.every((r) => r.language === "Python")).toBe(true);
+    expect(result.length).toBeGreaterThan(0);
   });
 
   it("filters by search query (topic)", () => {
@@ -63,9 +64,9 @@ describe("filterRepos", () => {
   });
 
   it("combines category and search filters", () => {
-    const result = filterRepos(CURATED_REPOS, "Python", "Algorithms");
+    const result = filterRepos(CURATED_REPOS, "Python", "GPT");
     expect(result.length).toBeGreaterThan(0);
-    expect(result.every((r) => r.category === "Algorithms")).toBe(true);
+    expect(result.every((r) => r.category === "GPT")).toBe(true);
   });
 
   it("returns empty for no match", () => {
