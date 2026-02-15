@@ -3,9 +3,11 @@ import { requireAuth } from "@/lib/auth-middleware";
 import { getRedis } from "@/lib/redis";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { parseRepoUrl, getUserOctokit, fetchFileContent } from "@/lib/github";
-import { checkCache, saveToCache, cloneToUserRepo } from "@/lib/curriculum-cache";
+import { checkCache, saveToCache, cloneToUserRepo, type Curriculum } from "@/lib/curriculum-cache";
 import { analyzeRepo } from "@/lib/repo-analysis";
 import { generateCurriculum } from "@/lib/gemini";
+import { listAvailableMaterials } from "@/lib/material-index";
+import { fetchCourse } from "@/lib/material-storage";
 import type { UserPreferences } from "@/components/proficiency-modal";
 
 /**
@@ -121,6 +123,78 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // 5b. Check learning material system (covers gists and pre-generated content)
+  try {
+    const materials = await listAvailableMaterials();
+    const match = materials.find(
+      (m) =>
+        m.owner.toLowerCase() === owner.toLowerCase() &&
+        m.name.toLowerCase() === repo.toLowerCase()
+    );
+
+    if (match) {
+      // Determine best level based on user preference
+      const levelMap: Record<string, "beginner" | "intermediate" | "advanced"> = {
+        beginner: "beginner",
+        intermediate: "intermediate",
+        advanced: "advanced",
+      };
+      const preferredLevel = levelMap[preferences.level] ?? "beginner";
+      // Fall back to any available level
+      const level =
+        match.levels[preferredLevel]
+          ? preferredLevel
+          : match.levels.beginner
+            ? "beginner"
+            : match.levels.intermediate
+              ? "intermediate"
+              : "advanced";
+
+      const course = await fetchCourse(match.language, owner, repo, level);
+
+      if (course) {
+        // Convert learning material format to Curriculum format
+        const modules = (course.modules ?? []) as Array<{
+          title: string;
+          description: string;
+          estimatedMinutes: number;
+          lessons: Array<{
+            title: string;
+            keyTakeaways?: string[];
+          }>;
+        }>;
+
+        const curriculum: Curriculum = {
+          repoOwner: owner,
+          repoName: repo,
+          categories: modules.map((mod) => ({
+            name: mod.title,
+            description: mod.description,
+            topics: mod.lessons.map((lesson) => ({
+              name: lesson.title,
+              difficulty: level === "advanced" ? ("expert" as const) : (level as "beginner" | "intermediate"),
+              estimatedMinutes: Math.round(
+                mod.estimatedMinutes / Math.max(mod.lessons.length, 1)
+              ),
+              prerequisites: [],
+              subtopics: lesson.keyTakeaways ?? [],
+            })),
+          })),
+        };
+
+        return Response.json(
+          {
+            source: "material",
+            curriculum,
+          },
+          { headers: rateLimitHeaders }
+        );
+      }
+    }
+  } catch {
+    // Material lookup failed — continue to repo analysis
+  }
+
   // 6. Analyze repo (fetch metadata, file tree, file contents)
   let analysis;
   try {
@@ -130,8 +204,12 @@ export async function POST(request: NextRequest) {
 
     analysis = await analyzeRepo(octokit, owner, repo);
   } catch (e) {
+    const raw = e instanceof Error ? e.message : "";
+    // Don't leak upstream API error details to the client
     const message =
-      e instanceof Error ? e.message : "Failed to analyze repository";
+      raw.includes("Not Found") || raw.includes("api.github.com")
+        ? `Could not access ${owner}/${repo}. It may be a private repo, a Gist, or temporarily unavailable.`
+        : raw || "Failed to analyze repository";
     return Response.json(
       { error: "analysis_failed", message },
       { status: 502, headers: rateLimitHeaders }
@@ -182,8 +260,11 @@ export async function POST(request: NextRequest) {
       preferences
     );
   } catch (e) {
+    const raw = e instanceof Error ? e.message : "";
     const message =
-      e instanceof Error ? e.message : "Failed to generate curriculum";
+      raw.includes("api.github.com") || raw.includes("Not Found")
+        ? `Could not generate curriculum for ${owner}/${repo}. Please try again later.`
+        : raw || "Failed to generate curriculum";
     return Response.json(
       { error: "generation_failed", message },
       { status: 502, headers: rateLimitHeaders }

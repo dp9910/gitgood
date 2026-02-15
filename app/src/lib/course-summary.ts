@@ -438,8 +438,11 @@ export async function generateSummary(
   contentType: "readme" | "code"
 ): Promise<CourseSummary> {
   if (!content) {
+    const hint = isGistId(name)
+      ? "This GitHub Gist may be private, deleted, or temporarily unavailable."
+      : "The repository may be private, empty, or temporarily unavailable.";
     throw new Error(
-      `Could not fetch any content for ${owner}/${name}. Cannot generate a meaningful summary without README or code files.`
+      `Could not fetch content for ${owner}/${name}. ${hint}`
     );
   }
 
@@ -499,19 +502,19 @@ export async function getOrGenerateSummary(
   let content: string | null = null;
   let contentType: "readme" | "code" = "readme";
 
-  // 3a. Try README first
-  content = await fetchReadme(owner, name);
-
-  // 3b. If no README and name is a gist ID, try the Gist API
-  if (!content && isGistId(name)) {
+  if (isGistId(name)) {
+    // Gists use a completely different API — repos API will always 404
     content = await fetchGistContext(name);
     contentType = "code";
-  }
+  } else {
+    // 3a. Try README first
+    content = await fetchReadme(owner, name);
 
-  // 3c. Fall back to repo code context
-  if (!content) {
-    content = await fetchCodeContext(owner, name);
-    contentType = "code";
+    // 3b. Fall back to repo code context
+    if (!content) {
+      content = await fetchCodeContext(owner, name);
+      contentType = "code";
+    }
   }
 
   const summaryData = await generateSummary(owner, name, content, contentType);

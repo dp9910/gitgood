@@ -127,6 +127,32 @@ describe("POST /api/course-summary", () => {
 
     expect(res.status).toBe(502);
     expect(data.error).toBe("generation_failed");
-    expect(data.message).toBe("Gemini error");
+    // Unsafe error messages are replaced with a generic user-friendly message
+    expect(data.message).toContain("Could not generate summary");
+  });
+
+  it("passes through safe error messages", async () => {
+    mockGetOrGenerateSummary.mockRejectedValue(
+      new Error("Could not fetch content for owner/repo. The repository may be private.")
+    );
+
+    const res = await POST(makeRequest({ owner: "owner", name: "repo" }) as never);
+    const data = await res.json();
+
+    expect(res.status).toBe(502);
+    expect(data.message).toContain("Could not fetch content");
+  });
+
+  it("sanitizes upstream API error messages", async () => {
+    mockGetOrGenerateSummary.mockRejectedValue(
+      new Error("Not Found - https://docs.github.com/rest/repos/repos#get-a-repository")
+    );
+
+    const res = await POST(makeRequest({ owner: "owner", name: "repo" }) as never);
+    const data = await res.json();
+
+    expect(res.status).toBe(502);
+    expect(data.message).not.toContain("docs.github.com");
+    expect(data.message).toContain("Could not generate summary");
   });
 });

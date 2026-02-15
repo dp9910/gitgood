@@ -629,7 +629,7 @@ describe("generateSummary", () => {
   it("throws when content is null", async () => {
     await expect(
       generateSummary("karpathy", "micrograd", null, "code")
-    ).rejects.toThrow("Could not fetch any content");
+    ).rejects.toThrow("Could not fetch content");
     expect(mockGenerateContent).not.toHaveBeenCalled();
   });
 

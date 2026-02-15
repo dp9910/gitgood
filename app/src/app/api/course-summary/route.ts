@@ -39,8 +39,15 @@ export async function POST(request: NextRequest) {
     const { summary, source } = await getOrGenerateSummary(owner, name);
     return Response.json({ summary, source });
   } catch (e) {
-    const message =
-      e instanceof Error ? e.message : "Failed to generate summary";
+    const raw = e instanceof Error ? e.message : "";
+    // Only show our own error messages to users — never leak upstream API details
+    const isSafe =
+      raw.startsWith("Could not fetch content") ||
+      raw.startsWith("Missing") ||
+      raw.startsWith("Invalid");
+    const message = isSafe
+      ? raw
+      : `Could not generate summary for ${owner}/${name}. The repository may be private or temporarily unavailable.`;
     return Response.json(
       { error: "generation_failed", message },
       { status: 502 }

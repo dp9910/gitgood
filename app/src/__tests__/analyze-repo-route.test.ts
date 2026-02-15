@@ -278,7 +278,9 @@ describe("POST /api/analyze-repo", () => {
 
     const body = await res.json();
     expect(body.error).toBe("analysis_failed");
-    expect(body.message).toBe("Not Found");
+    // "Not Found" errors are sanitized to user-friendly messages
+    expect(body.message).toContain("Could not access");
+    expect(body.message).not.toContain("Not Found");
   });
 
   it("returns 502 when AI generation fails", async () => {
